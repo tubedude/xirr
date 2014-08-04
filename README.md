@@ -11,7 +11,7 @@ Add this line to your application's Gemfile:
 
 And then execute:
 
-    $ bundle
+    $ bundle install
 
 Or install it yourself as:
 
@@ -20,15 +20,18 @@ Or install it yourself as:
 ## Usage
 
 
-cf = Cashflow.new
-cf << Transaction.new(1000, '2014-01-01'.to_time.utc)
-cf << Transaction.new(1000, '2014-03-01'.to_time.utc)
-cf << Transaction.new(-4000, '2014-06-01'.to_time.utc)
-cf.xirr
+    include Xirr
+    
+    cf = Cashflow.new
+    cf << Transaction.new(-1000,  date: '2014-01-01'.to_time(:utc))
+    cf << Transaction.new(-2000,  date: '2014-03-01'.to_time(:utc))
+    cf << Transaction.new( 4500, date: '2015-12-01'.to_time(:utc))
+    cf.xirr
+    # 0.25159694345042327 # [Float]
 
 ## Contributing
 
-1. Fork it ( https://github.com/[my-github-username]/xirr/fork )
+1. Fork it ( https://github.com/tubedude/xirr/fork )
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)

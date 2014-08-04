@@ -1,9 +1,8 @@
 module Xirr
 
   class Transaction
-
     attr_reader :amount
-    attr_accessor :date, :investment, :description, :company, :round, :shareholder
+    attr_accessor :date
 
     def initialize(amount, opts={})
       @amount = amount
