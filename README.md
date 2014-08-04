@@ -1,7 +1,9 @@
 # Xirr
 
+[![Coverage Status](https://img.shields.io/coveralls/tubedude/xirr.svg)](https://coveralls.io/r/tubedude/xirr)
+
 This is a simple gem to calculate XIRR on Bisection Method based on this gist http://puneinvestor.wordpress.com/2013/10/01/calculate-xirr-in-ruby-bisection-method/
-and ont Finance gem written by 
+and ont Finance gem https://github.com/wkranec/finance
 
 ## Installation
 
