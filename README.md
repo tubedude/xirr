@@ -1,6 +1,5 @@
 # Xirr
-
-[![Coverage Status](https://img.shields.io/coveralls/tubedude/xirr.svg)](https://coveralls.io/r/tubedude/xirr)
+[![Build Status](https://travis-ci.org/tubedude/xirr.svg)](https://travis-ci.org/tubedude/xirr)[![Coverage Status](https://img.shields.io/coveralls/tubedude/xirr.svg)](https://coveralls.io/r/tubedude/xirr)[![Code Climate](https://codeclimate.com/github/tubedude/xirr/badges/gpa.svg)](https://codeclimate.com/github/tubedude/xirr)
 
 This is a simple gem to calculate XIRR on Bisection Method based on this gist http://puneinvestor.wordpress.com/2013/10/01/calculate-xirr-in-ruby-bisection-method/
 and ont Finance gem https://github.com/wkranec/finance
