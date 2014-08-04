@@ -5,6 +5,8 @@ module Xirr
   module Main
     extend ActiveSupport::Concern
 
+    # Calculates yearly Internal Rate of Return
+    # returns [Float]
     def xirr(guess = nil)
 
       self.valid?
@@ -48,7 +50,8 @@ module Xirr
     end
 
     private
-    def nfv(rate)
+
+    def nfv(rate) # :nodoc:
 
       today = self.map(&:date).max.to_date
       nfv = 0
