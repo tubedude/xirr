@@ -17,9 +17,8 @@ module Xirr
       # Bisection method finding the rate to zero nfv
 
       # Initial values
-      days_in_year = Xirr.config.days_in_year.to_f
-      left = -0.99/days_in_year
-      right = 9.99/days_in_year
+      left = -0.99
+      right = 9.99
       epsilon = Xirr.config.eps.to_f
       guess = self.irr_guess.to_f
 
@@ -28,43 +27,36 @@ module Xirr
 
         midpoint = guess || (right + left)/2
         guess = nil
-        nfv_positive?(left, midpoint) ? left = midpoint : right = midpoint
+        npv_positive?(midpoint) ? right = midpoint : left = midpoint
 
       end
 
-      return format_irr(left, right)
+      return format_irr left, right
 
     end
 
     private
 
-    # @param left [Float]
     # @param midpoint [Float]
     # @return [Bolean]
-    # Returns true if result is to the right ot the range
-    def nfv_positive?(left, midpoint)
-      (nfv(left) * nfv(midpoint) > 0)
+    # Returns true if result is to the left ot the range
+    def npv_positive?(midpoint)
+      npv(midpoint) > 0
     end
 
     # @param left [Float]
     # @param right [Float]
     # @return [Float] IRR of the Cashflow
     def format_irr(left, right)
-      days_in_year = Xirr.config.days_in_year.to_f
-      # Irr for daily cashflow (not in percentage format)
       irr = (right+left) / 2
-      # Irr for daily cashflow multiplied by 365 to get yearly return
-      irr = irr * days_in_year
-      # Annualized yield (return) reflecting compounding effect of daily returns
-      irr = (1 + irr / days_in_year) ** days_in_year - 1
     end
 
-    # Returns the Net future value of the flow given a Rate
+    # Returns the Net Present Value of the flow given a Rate
     # @param rate [Float]
     # @return [Float]
-    def nfv(rate) # :nodoc:
-      self.inject(0) do |nfv,t|
-        nfv = nfv + t.amount * ((1 + rate) ** t_in_days(t.date))
+    def npv(rate) # :nodoc:
+      self.inject(0) do |npv, t|
+        npv += t.amount * ((1 + rate) ** t_in_days(t.date))
       end
     end
 
@@ -72,7 +64,7 @@ module Xirr
     # @return [Rational]
     # @param date [Time]
     def t_in_days(date)
-      Date.parse(max_date.to_s) - Date.parse(date.to_s)
+      (Date.parse(max_date.to_s) - Date.parse(date.to_s)) / Xirr.config.days_in_year.to_f
     end
 
   end
