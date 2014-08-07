@@ -10,27 +10,24 @@ module Xirr
     # An initial guess rate will override the {Cashflow#irr_guess}
     def xirr(midpoint = nil)
 
-      # Raises error if Cashflow is not valid
-      cf.valid?
-
-      # Bisection method finding the rate to zero nfv
-
       # Initial values
       left = BigDecimal.new -0.99, Xirr::PRECISION
       right = BigDecimal.new 9.99, Xirr::PRECISION
-      eps = Xirr::EPS
       midpoint ||= cf.irr_guess
       limit = Xirr.config.iteration_limit.to_i
       runs = 0
 
       # Loops until difference is within error margin
-      while ((right-left).abs > eps) do
+      while ((right - left).abs > Xirr::EPS && runs < limit) do
 
-        raise 'Did not converge' if runs == limit
         runs += 1
         npv_positive?(midpoint) ? right = midpoint : left = midpoint
         midpoint = format_irr(left, right)
 
+      end
+
+      if runs >= limit
+        raise ArgumentError, 'Did not converge'
       end
 
       return midpoint.round Xirr::PRECISION

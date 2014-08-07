@@ -47,7 +47,7 @@ module Xirr
     # Calculates a simple IRR guess based on period of investment and multiples.
     # @return [Float]
     def irr_guess
-      ((multiple ** (1 / years_of_investment)) - 1).round(3)
+      ((multiple ** (1 / years_of_investment)) - 1).round(3) if valid?
     end
 
     # @param guess [Float]
@@ -55,7 +55,12 @@ module Xirr
     # @return [Float]
     # Finds the XIRR according to the method provided. Default to Bisection
     def xirr(guess = nil, method = Xirr.config.default_method)
-      method == :bisection ? Bisection.new(self).xirr(guess) : NewtonMethod.new(self).xirr(guess)
+      _method = if method == :bisection
+                  Bisection.new(self)
+                else
+                  NewtonMethod.new(self)
+                end
+      _method.send :xirr, guess if valid?
     end
 
     # First investment date
@@ -91,7 +96,6 @@ module Xirr
     # @return
     def years_of_investment
       (max_date - min_date) / (365).to_f
-      # (max_date - min_date) / (365 * 24 * 60 * 60).to_f
     end
 
     # @api private
@@ -127,7 +131,7 @@ module Xirr
     # Error message depending on the missing transaction
     def invalid_message
       return 'No positive transaction' if positives.empty?
-      return 'No negatives transaction' if negatives.empty?
+      return 'No negative transaction' if negatives.empty?
     end
 
   end

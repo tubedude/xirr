@@ -2,7 +2,7 @@ require_relative 'test_helper'
 
 describe 'Cashflows' do
 
-  describe 'of a good investment' do
+  describe 'of a ok investment' do
     before(:all) do
       @cf = Cashflow.new
       @cf << Transaction.new(1000, date: '1985-01-01'.to_date)
@@ -26,15 +26,77 @@ describe 'Cashflows' do
       assert_equal '0.208'.to_f, @cf.irr_guess
     end
   end
-  describe 'an invalid array of Transactions' do
-    it 'should have an Internal Rate of Return' do
+
+  describe 'of a good investment' do
+    before(:all) do
+      @cf = Cashflow.new
+      @cf << Transaction.new(1000, date: '1985-01-01'.to_date)
+      @cf << Transaction.new(-6000, date: '1985-01-02'.to_date)
+    end
+
+    it 'has an Internal Rate of Return on Bisection Method' do
+      assert_equal '1.0597572345993451e+284'.to_f, @cf.xirr
+    end
+
+=begin
+    # Check why limit is not being enforced
+    it 'has an Internal Rate of Return on Bisection Method using a Guess' do
+      assert_equal '0.225683'.to_f, @cf.xirr(0.15)
+    end
+=end
+
+    it 'has an Internal Rate of Return on Newton Method' do
+      assert_equal '1.0597572345993451e+284'.to_f, @cf.xirr(nil, :newton_method)
+    end
+
+    it 'has an educated guess' do
+      assert_equal '1.0597572345993451e+284'.to_f, @cf.irr_guess
+    end
+  end
+
+  describe 'an all-negative Cashflow' do
+    before(:all) do
       @cf = Cashflow.new
       @cf << Transaction.new(-600, date: '1990-01-01'.to_date)
       @cf << Transaction.new(-600, date: '1995-01-01'.to_date)
+    end
+
+    it 'is invalid' do
       assert_raises(ArgumentError) { @cf.valid? }
     end
+
+    it 'raises error when xirr is called' do
+      assert_raises(ArgumentError) { @cf.xirr }
+    end
+
+    it 'raises error when xirr is called' do
+      assert_raises(ArgumentError) { @cf.irr_guess }
+    end
+
   end
+
+  describe 'an all-positive Cashflow' do
+    before(:all) do
+      @cf = Cashflow.new
+      @cf << Transaction.new(600, date: '1990-01-01'.to_date)
+      @cf << Transaction.new(600, date: '1995-01-01'.to_date)
+    end
+
+    it 'is invalid' do
+      assert_raises(ArgumentError) { @cf.valid? }
+    end
+
+    it 'raises error when xirr is called' do
+      assert_raises(ArgumentError) { @cf.xirr }
+    end
+
+    it 'raises error when xirr is called' do
+      assert_raises(ArgumentError) { @cf.irr_guess }
+    end
+  end
+
   describe 'of a bad investment' do
+
     before(:all) do
       @cf = Cashflow.new
       @cf << Transaction.new(1000, date: '1985-01-01'.to_date)
@@ -55,6 +117,7 @@ describe 'Cashflows' do
     end
 
   end
+
   describe 'of a long investment' do
     before(:all) do
       @cf = Cashflow.new
