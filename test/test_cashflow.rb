@@ -89,8 +89,13 @@ describe 'Cashflows' do
     end
 
     it 'is invalid' do
-      assert_raises(ArgumentError) { @cf.valid? }
+      assert true, !@cf.valid?
     end
+
+    it 'returns 0 instead of expection ' do
+      assert_equal BigDecimal.new(0, 6), @cf.xirr_no_exception
+    end
+
 
     it 'with a wrong method is invalid' do
       assert_raises(ArgumentError) { @cf.xirr(nil, :no_method) }
@@ -101,7 +106,7 @@ describe 'Cashflows' do
     end
 
     it 'raises error when xirr is called' do
-      assert_raises(ArgumentError) { @cf.irr_guess }
+      assert true, !@cf.irr_guess
     end
 
   end
@@ -114,7 +119,7 @@ describe 'Cashflows' do
     end
 
     it 'is invalid' do
-      assert_raises(ArgumentError) { @cf.valid? }
+      assert true, !@cf.valid?
     end
 
     it 'raises error when xirr is called' do
@@ -122,7 +127,7 @@ describe 'Cashflows' do
     end
 
     it 'raises error when xirr is called' do
-      assert_raises(ArgumentError) { @cf.irr_guess }
+      assert true, !@cf.irr_guess
     end
   end
 

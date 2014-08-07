@@ -1,3 +1,10 @@
+## Version 0.2.4
+
+* Cashflow Invalid Messages are now public.
+* Cashflow Invalid? won't raise exception
+* Running XIRR in an invalid cashflow will throw exception
+* New Cashflow No Exception XIRR call.
+
 ## Version 0.2.3
 
 * Major fix to Bisection Engine.

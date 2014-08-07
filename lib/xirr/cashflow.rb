@@ -19,11 +19,7 @@ module Xirr
     # Check if Cashflow is invalid and raises ArgumentError
     # @return [Boolean]
     def invalid?
-      if positives.empty? || negatives.empty?
-        raise ArgumentError, invalid_message
-      else
-        false
-      end
+      positives.empty? || negatives.empty?
     end
 
     # Inverse of #invalid?
@@ -47,7 +43,7 @@ module Xirr
     # Calculates a simple IRR guess based on period of investment and multiples.
     # @return [Float]
     def irr_guess
-      ((multiple ** (1 / years_of_investment)) - 1).round(3) if valid?
+      valid? ? ((multiple ** (1 / years_of_investment)) - 1).round(3) : false
     end
 
     # @param guess [Float]
@@ -55,16 +51,25 @@ module Xirr
     # @return [Float]
     # Finds the XIRR according to the method provided. Default to Bisection
     def xirr(guess = nil, method = Xirr.config.default_method)
-      _method = case method
-                  when :bisection
-                    Bisection.new(self)
-                  when :newton_method
-                    NewtonMethod.new(self)
-                  else
-                    raise ArgumentError, "There is no #{method} method"
-                end
-      _method.send :xirr, guess if valid?
+      if valid?
+        choose_(method).send :xirr, guess
+      else
+        raise ArgumentError, invalid_message
+      end
     end
+
+    # Calls XIRR but throws no exception and returns with 0
+    # @param guess [Float]
+    # @param method [Symbol]
+    # @return [Float]
+    def xirr_no_exception(guess = nil, method = Xirr.config.default_method)
+      if invalid?
+        BigDecimal.new(0, Xirr::PRECISION)
+      else
+        xirr(guess, method)
+      end
+    end
+
 
     # First investment date
     # @return [Time]
@@ -72,7 +77,28 @@ module Xirr
       @min_date ||= self.map(&:date).min
     end
 
+    # @return [String]
+    # Error message depending on the missing transaction
+    def invalid_message
+      return 'No positive transaction' if positives.empty?
+      return 'No negative transaction' if negatives.empty?
+    end
+
     private
+
+    # @param method [Symbol]
+    # Choose a Method to call.
+    # @return [Class]
+    def choose_(method)
+      case method
+        when :bisection
+          Bisection.new(self)
+        when :newton_method
+          NewtonMethod.new(self)
+        else
+          raise ArgumentError, "There is no #{method} method"
+      end
+    end
 
     # @api private
     # Sorts the {Cashflow} by date ascending
@@ -129,13 +155,6 @@ module Xirr
       @negatives, @positives = self.partition { |x| x.amount >= 0 } # Inverted as negative amount is good
     end
 
-    # @api private
-    # @return [String]
-    # Error message depending on the missing transaction
-    def invalid_message
-      return 'No positive transaction' if positives.empty?
-      return 'No negative transaction' if negatives.empty?
-    end
 
   end
 
