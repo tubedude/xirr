@@ -16,7 +16,7 @@ module Xirr
       self.flatten!
     end
 
-    # Check if Cashflow is invalid and raises ArgumentError
+    # Check if Cashflow is invalid
     # @return [Boolean]
     def invalid?
       positives.empty? || negatives.empty?
@@ -50,7 +50,7 @@ module Xirr
     # @param method [Symbol]
     # @return [Float]
     # Finds the XIRR according to the method provided. Default to Bisection
-    def xirr(guess = nil, method = Xirr.config.default_method)
+    def xirr_with_exception(guess = nil, method = Xirr.config.default_method)
       if valid?
         choose_(method).send :xirr, guess
       else
@@ -62,11 +62,11 @@ module Xirr
     # @param guess [Float]
     # @param method [Symbol]
     # @return [Float]
-    def xirr_no_exception(guess = nil, method = Xirr.config.default_method)
+    def xirr(guess = nil, method = Xirr.config.default_method)
       if invalid?
         BigDecimal.new(0, Xirr::PRECISION)
       else
-        xirr(guess, method)
+        xirr_with_exception(guess, method)
       end
     end
 

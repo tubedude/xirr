@@ -1,3 +1,8 @@
+## Version 0.2.5
+
+* Default XIRR does not raise an Exception if cashflow is invalid
+
+
 ## Version 0.2.4
 
 * Cashflow Invalid Messages are now public.

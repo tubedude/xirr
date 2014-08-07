@@ -14,8 +14,12 @@ describe 'Cashflows' do
       assert_raises(ArgumentError) { @cf.xirr(nil, :no_method) }
     end
 
-    it 'has an Internal Rate of Return on Bisection Method' do
+    it 'has an Internal Rate of Return on default Method' do
       assert_equal '0.225683'.to_f, @cf.xirr
+    end
+
+    it 'has an Internal Rate of Return on default Method' do
+      assert_equal '0.225683'.to_f, @cf.xirr(nil, :bisection)
     end
 
     it 'has an Internal Rate of Return on Bisection Method using a Guess' do
