@@ -33,7 +33,7 @@ module Xirr
 
       end
 
-      return midpoint, round Xirr::PRECISION
+      return midpoint.round Xirr::PRECISION
 
     end
 
