@@ -39,7 +39,7 @@ describe 'Cashflows' do
     end
 
 =begin
-    # Check why limit is not being enforced
+    # FIXME Check why limit is not being enforced
     it 'has an Internal Rate of Return on Bisection Method using a Guess' do
       assert_equal '0.225683'.to_f, @cf.xirr(0.15)
     end

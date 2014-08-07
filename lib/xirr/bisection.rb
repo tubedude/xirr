@@ -14,11 +14,10 @@ module Xirr
       left = BigDecimal.new -0.99, Xirr::PRECISION
       right = BigDecimal.new 9.99, Xirr::PRECISION
       midpoint ||= cf.irr_guess
-      limit = Xirr.config.iteration_limit.to_i
       runs = 0
 
       # Loops until difference is within error margin
-      while ((right - left).abs > Xirr::EPS && runs < limit) do
+      while ((right - left).abs > Xirr::EPS && runs < Xirr.config.iteration_limit.to_i) do
 
         runs += 1
         npv_positive?(midpoint) ? right = midpoint : left = midpoint
@@ -26,7 +25,7 @@ module Xirr
 
       end
 
-      if runs >= limit
+      if runs >= Xirr.config.iteration_limit.to_i
         raise ArgumentError, 'Did not converge'
       end
 

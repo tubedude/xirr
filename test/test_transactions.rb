@@ -10,4 +10,8 @@ describe 'Transaction' do
   it 'retreives the date' do
     assert_equal Date.today, @t.date
   end
+  it 'has inspect' do
+    assert_equal "T(1000.0,#{Date.today})", @t.inspect
+  end
+
 end
