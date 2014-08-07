@@ -11,7 +11,7 @@ module Xirr
     # @param opts [Hash]
     # @note Don't forget to add date: [Date] in the opts hash.
     def initialize(amount, opts={})
-      @amount = amount.to_f
+      self.amount = amount
 
       # Set optional attributes..
       opts.each do |key, value|
