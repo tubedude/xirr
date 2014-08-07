@@ -25,5 +25,13 @@ module Xirr
       (date - cf.min_date) / Xirr::DAYS_IN_YEAR
     end
 
+    # Net Present Value funtion that will be used to reduce the cashflow
+    # @param rate [BigDecimal]
+    def xnpv(rate)
+      cf.inject(0) do |sum, t|
+        sum += t.amount / (1 + rate) ** t_in_days(t.date)
+      end
+    end
+
   end
 end

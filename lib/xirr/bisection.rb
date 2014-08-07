@@ -43,7 +43,7 @@ module Xirr
     # @return [Bolean]
     # Returns true if result is to the right ot the range
     def npv_positive?(midpoint)
-      npv(midpoint) > 0
+      xnpv(midpoint) > 0
     end
 
     # @param left [Float]
@@ -51,15 +51,6 @@ module Xirr
     # @return [Float] IRR of the Cashflow
     def format_irr(left, right)
       irr = (right+left) / 2
-    end
-
-    # Returns the Net Present Value of the flow given a Rate
-    # @param rate [Float]
-    # @return [Float]
-    def npv(rate) # :nodoc:
-      cf.inject(0) do |npv, t|
-        npv += t.amount / (1 + rate) ** t_in_days(t.date)
-      end
     end
 
   end
