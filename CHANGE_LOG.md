@@ -1,3 +1,7 @@
+## Version 0.2.1
+
+* Output is rounded to default precision.
+
 ## Version 0.2.0
 
 * Added Newton Method, but Bisection is still the default.
