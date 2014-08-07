@@ -47,7 +47,7 @@ module Xirr
       func = Function.new(self, :xnpv)
       rate = [guess || cf.irr_guess.to_f]
       nlsolve(func, rate)
-      rate[0]
+      rate[0].round Xirr::PRECISION
     end
 
   end

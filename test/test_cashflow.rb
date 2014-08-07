@@ -11,19 +11,19 @@ describe 'Cashflows' do
     end
 
     it 'has an Internal Rate of Return on Bisection Method' do
-      assert_equal '0.225683'.to_f, @cf.xirr.round(6)
+      assert_equal '0.225683'.to_f, @cf.xirr
     end
 
     it 'has an Internal Rate of Return on Bisection Method using a Guess' do
-      assert_equal '0.225683'.to_f, @cf.xirr(0.15).round(6)
+      assert_equal '0.225683'.to_f, @cf.xirr(0.15)
     end
 
     it 'has an Internal Rate of Return on Newton Method' do
-      assert_equal '0.225683'.to_f, @cf.xirr(nil, :newton_method).round(6)
+      assert_equal '0.225683'.to_f, @cf.xirr(nil, :newton_method)
     end
 
     it 'has an educated guess' do
-      assert_equal '0.208'.to_f, @cf.irr_guess.round(6)
+      assert_equal '0.208'.to_f, @cf.irr_guess
     end
   end
   describe 'an invalid array of Transactions' do
@@ -43,15 +43,15 @@ describe 'Cashflows' do
     end
 
     it 'has an Internal Rate of Return on Bisection Method' do
-      assert_equal '-0.034592'.to_f, @cf.xirr.round(6)
+      assert_equal '-0.034592'.to_f, @cf.xirr
     end
 
     it 'has an Internal Rate of Return on Newton Method' do
-      assert true, @cf.xirr(nil, :newton_method).round(6).nan?
+      assert true, @cf.xirr(nil, :newton_method).nan?
     end
 
     it 'has an educated guess' do
-      assert_equal -0.022, @cf.irr_guess.round(6)
+      assert_equal -0.022, @cf.irr_guess
     end
 
   end
@@ -63,11 +63,11 @@ describe 'Cashflows' do
     end
 
     it 'has an Internal Rate of Return on Bisection Method' do
-      assert_equal '0.112339'.to_f, @cf.xirr.round(6)
+      assert_equal '0.112339'.to_f, @cf.xirr
     end
 
     it 'has an Internal Rate of Return on Newton Method' do
-      assert_equal '0.112339'.to_f, @cf.xirr(nil, :newton_method).round(6)
+      assert_equal '0.112339'.to_f, @cf.xirr(nil, :newton_method)
     end
 
     it 'has an educated guess' do
