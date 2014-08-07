@@ -1,0 +1,62 @@
+require 'bigdecimal/newton'
+include Newton
+
+module Xirr
+  # Class to calculate IRR using Newton Method
+  class NewtonMethod
+    include Base
+
+    # Base class for working with Newton's Method.
+    # @api private
+    class Function
+      values = {
+          eps: Xirr::EPS,
+          one: "1.0",
+          two: "2.0",
+          ten: "10.0",
+          zero: "0.0"
+      }
+
+      # define default values
+      values.each do |key, value|
+        define_method key do
+          BigDecimal.new(value, Xirr::PRECISION)
+        end
+      end
+
+      # @param transactions [Cashflow]
+      # @param function [Symbol]
+      # Initializes the Function with the Cashflow it will use as data source and the funcion to reduce it.
+      def initialize(transactions, function)
+        @transactions = transactions
+        @function = function
+      end
+
+      # Necessary for #nlsolve
+      # @param x [BigDecimal]
+      def values(x)
+        value = @transactions.send(@function, BigDecimal.new(x[0].to_s, Xirr::PRECISION))
+        [BigDecimal.new(value.to_s, Xirr::PRECISION)]
+      end
+    end
+
+    # Net Present Value funtion that will be used to reduce the cashflow
+    # @param rate [BigDecimal]
+    def xnpv(rate)
+      cf.inject(0) do |sum, t|
+        sum += t.amount / (1 + rate) ** t_in_days(t.date)
+      end
+    end
+
+    # Calculates XIRR using Newton method
+    # @return [BigDecimal]
+    # @param guess [Float]
+    def xirr(guess=nil)
+      func = Function.new(self, :xnpv)
+      rate = [guess || cf.irr_guess.to_f]
+      nlsolve(func, rate)
+      rate[0]
+    end
+
+  end
+end

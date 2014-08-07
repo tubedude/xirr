@@ -3,17 +3,15 @@ module Xirr
   # Expands [Array] to store a set of transactions which will be used to calculate the XIRR
   # @note A Cashflow should consist of at least two transactions, one positive and one negative.
   class Cashflow < Array
-    include Xirr::Main
 
-    # @api public
     # @param args [Transaction]
     # @example Creating a Cashflow
     #   cf = Cashflow.new
-    #   cf << Transaction.new( 1000, date: '2013-01-01'.to_time(:utc))
-    #   cf << Transaction.new(-1234, date: '2013-03-31'.to_time(:utc))
+    #   cf << Transaction.new( 1000, date: '2013-01-01'.to_date)
+    #   cf << Transaction.new(-1234, date: '2013-03-31'.to_date)
     #   Or
-    #   cf = Cashflow.new Transaction.new( 1000, date: '2013-01-01'.to_time(:utc)), Transaction.new(-1234, date: '2013-03-31'.to_time(:utc))
-    def initialize(*args) # :nodoc:
+    #   cf = Cashflow.new Transaction.new( 1000, date: '2013-01-01'.to_date), Transaction.new(-1234, date: '2013-03-31'.to_date)
+    def initialize(*args)
       args.each { |a| self << a }
       self.flatten!
     end
@@ -36,13 +34,13 @@ module Xirr
 
     # @return [Float]
     # Sums all amounts in a cashflow
-    def sum # :nodoc:
+    def sum
       self.map(&:amount).sum
     end
 
     # Last investment date
     # @return [Time]
-    def max_date # :nodoc:
+    def max_date
       @max_date ||= self.map(&:date).max
     end
 
@@ -50,6 +48,20 @@ module Xirr
     # @return [Float]
     def irr_guess
       ((multiple ** (1 / years_of_investment)) - 1).round(3)
+    end
+
+    # @param guess [Float]
+    # @param method [Symbol]
+    # @return [Float]
+    # Finds the XIRR according to the method provided. Default to Bisection
+    def xirr(guess = nil, method = Xirr.config.default_method)
+      method == :bisection ? Bisection.new(self).xirr(guess) : NewtonMethod.new(self).xirr(guess)
+    end
+
+    # First investment date
+    # @return [Time]
+    def min_date
+      @min_date ||= self.map(&:date).min
     end
 
     private
@@ -69,7 +81,7 @@ module Xirr
     #   [100,100,-300] and [-100,-100,300] returns 1.5
     # @api private
     # @return [Float]
-    def multiple # :nodoc:
+    def multiple
       result = positives.sum(&:amount) / -negatives.sum(&:amount)
       first_transaction_direction > 0 ? result : 1 / result
     end
@@ -77,15 +89,9 @@ module Xirr
     # @api private
     # Counts how many years from first to last transaction in the cashflow
     # @return
-    def years_of_investment # :nodoc:
-      (max_date - min_date) / (365 * 24 * 60 * 60).to_f
-    end
-
-    # @api private
-    # First investment date
-    # @return [Time]
-    def min_date # :nodoc:
-      @min_date ||= self.map(&:date).min
+    def years_of_investment
+      (max_date - min_date) / (365).to_f
+      # (max_date - min_date) / (365 * 24 * 60 * 60).to_f
     end
 
     # @api private
@@ -93,7 +99,7 @@ module Xirr
     # @see #negatives
     # @see #split_transactions
     # Finds all transactions income from Cashflow
-    def positives # :nodoc:
+    def positives
       split_transactions
       @positives
     end
@@ -103,7 +109,7 @@ module Xirr
     # @see #positives
     # @see #split_transactions
     # Finds all transactions investments from Cashflow
-    def negatives # :nodoc:
+    def negatives
       split_transactions
       @negatives
     end
@@ -112,14 +118,14 @@ module Xirr
     # @see #positives
     # @see #negatives
     # Uses partition to separate the investment transactions Negatives and the income transactions (Positives)
-    def split_transactions # :nodoc:
+    def split_transactions
       @negatives, @positives = self.partition { |x| x.amount >= 0 } # Inverted as negative amount is good
     end
 
     # @api private
     # @return [String]
     # Error message depending on the missing transaction
-    def invalid_message # :nodoc:
+    def invalid_message
       return 'No positive transaction' if positives.empty?
       return 'No negatives transaction' if negatives.empty?
     end

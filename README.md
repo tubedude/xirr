@@ -1,8 +1,7 @@
 # Xirr
 [![Build Status](https://travis-ci.org/tubedude/xirr.svg)](https://travis-ci.org/tubedude/xirr)[![Coverage Status](https://img.shields.io/coveralls/tubedude/xirr.svg)](https://coveralls.io/r/tubedude/xirr)[![Code Climate](https://codeclimate.com/github/tubedude/xirr/badges/gpa.svg)](https://codeclimate.com/github/tubedude/xirr)
 
-This is a simple gem to calculate XIRR on Bisection Method based on this gist http://puneinvestor.wordpress.com/2013/10/01/calculate-xirr-in-ruby-bisection-method/
-and ont Finance gem https://github.com/wkranec/finance
+This is a gem to calculate XIRR on Bisection Method or Newton Method.
 
 ## Installation
 
@@ -24,11 +23,30 @@ Or install it yourself as:
     include Xirr
     
     cf = Cashflow.new
-    cf << Transaction.new(-1000,  date: '2014-01-01'.to_time(:utc))
-    cf << Transaction.new(-2000,  date: '2014-03-01'.to_time(:utc))
-    cf << Transaction.new( 4500, date: '2015-12-01'.to_time(:utc))
+    cf << Transaction.new(-1000,  date: '2014-01-01'.to_date)
+    cf << Transaction.new(-2000,  date: '2014-03-01'.to_date)
+    cf << Transaction.new( 4500, date: '2015-12-01'.to_date)
     cf.xirr
-    # 0.25159694345042327 # [Float]
+    # 0.25159694345042327 # [BigDecimal]
+
+## Configuration
+
+    # intializer/xirr.rb
+    
+    Xirr.configure do |config|
+      config.eps = '1.0e-12'
+      config.days_in_year = 365.25
+    end
+
+
+## Documentation
+
+http://rubydoc.info/github/tubedude/xirr/master/frames
+
+## Thanks
+
+http://puneinvestor.wordpress.com/2013/10/01/calculate-xirr-in-ruby-bisection-method/
+https://github.com/wkranec/finance
 
 ## Contributing
 

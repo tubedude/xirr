@@ -5,6 +5,8 @@ module Xirr
   default_values = {
       eps: '1.0e-12',
       days_in_year: 365,
+      iteration_limit: 100,
+      precision: 6
   }
 
   # Iterates trhough default values and sets in config
