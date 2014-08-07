@@ -11,8 +11,8 @@ module Xirr
     def xirr(midpoint = nil)
 
       # Initial values
-      left = BigDecimal.new -0.99, Xirr::PRECISION
-      right = BigDecimal.new 9.99, Xirr::PRECISION
+      left = [BigDecimal.new(-0.99, Xirr::PRECISION), cf.irr_guess].min
+      right = [BigDecimal.new(9.99, Xirr::PRECISION), cf.irr_guess + 1].max
       midpoint ||= cf.irr_guess
       runs = 0
 
@@ -20,13 +20,13 @@ module Xirr
       while ((right - left).abs > Xirr::EPS && runs < Xirr.config.iteration_limit.to_i) do
 
         runs += 1
-        npv_positive?(midpoint) ? right = midpoint : left = midpoint
+        npv_positive?(midpoint) == npv_positive?(left) ? left = midpoint : right = midpoint
         midpoint = format_irr(left, right)
 
       end
 
       if runs >= Xirr.config.iteration_limit.to_i
-        raise ArgumentError, 'Did not converge'
+        raise ArgumentError, "Did not converge after #{runs} tries."
       end
 
       return midpoint.round Xirr::PRECISION

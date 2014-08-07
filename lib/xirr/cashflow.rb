@@ -55,10 +55,13 @@ module Xirr
     # @return [Float]
     # Finds the XIRR according to the method provided. Default to Bisection
     def xirr(guess = nil, method = Xirr.config.default_method)
-      _method = if method == :bisection
-                  Bisection.new(self)
-                else
-                  NewtonMethod.new(self)
+      _method = case method
+                  when :bisection
+                    Bisection.new(self)
+                  when :newton_method
+                    NewtonMethod.new(self)
+                  else
+                    raise ArgumentError, "There is no #{method} method"
                 end
       _method.send :xirr, guess if valid?
     end

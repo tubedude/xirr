@@ -2,8 +2,7 @@ module Xirr
 
   # A unit of the Cashflow.
   class Transaction
-    attr_reader :amount
-    attr_accessor :date
+    attr_reader :amount, :date
 
     # @example
     #   Transaction.new -1000, date: Date.now
@@ -17,6 +16,13 @@ module Xirr
       opts.each do |key, value|
         send("#{key}=", value)
       end
+    end
+
+    # Sets the date
+    # @param value [Date, Time]
+    # @return [Date]
+    def date=(value)
+      @date = value.kind_of?(Time) ? value.to_date : value
     end
 
     # Sets the amount

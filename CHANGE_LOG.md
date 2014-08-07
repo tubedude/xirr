@@ -1,3 +1,14 @@
+## Version 0.2.3
+
+* Major fix to Bisection Engine.
+* Error if provided method is wrong.
+* Bisection: Initial guess is compared to default limits
+* Transaction converts Time to Date.
+
+## Version 0.2.2
+
+* Added Tests.
+
 ## Version 0.2.1
 
 * Output is rounded to default precision.

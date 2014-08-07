@@ -5,7 +5,7 @@ module Xirr
   # Days in a year
   DAYS_IN_YEAR = Xirr.config.days_in_year.to_f
   # Epsilon: error margin
-  EPS = Xirr.config.eps
+  EPS = Xirr.config.eps.to_f
 
   #  Base module for XIRR calculation Methods
   module Base

@@ -10,6 +10,36 @@ describe 'Cashflows' do
       @cf << Transaction.new(-6000, date: '1995-01-01'.to_date)
     end
 
+    it 'with a wrong method is invalid' do
+      assert_raises(ArgumentError) { @cf.xirr(nil, :no_method) }
+    end
+
+    it 'has an Internal Rate of Return on Bisection Method' do
+      assert_equal '0.225683'.to_f, @cf.xirr
+    end
+
+    it 'has an Internal Rate of Return on Bisection Method using a Guess' do
+      assert_equal '0.225683'.to_f, @cf.xirr(0.15)
+    end
+
+    it 'has an Internal Rate of Return on Newton Method' do
+      assert_equal '0.225683'.to_f, @cf.xirr(nil, :newton_method)
+    end
+
+    it 'has an educated guess' do
+      assert_equal '0.208'.to_f, @cf.irr_guess
+    end
+  end
+
+
+  describe 'of an inverted ok investment' do
+    before(:all) do
+      @cf = Cashflow.new
+      @cf << Transaction.new(-1000, date: '1985-01-01'.to_date)
+      @cf << Transaction.new(600, date: '1990-01-01'.to_date)
+      @cf << Transaction.new(6000, date: '1995-01-01'.to_date)
+    end
+
     it 'has an Internal Rate of Return on Bisection Method' do
       assert_equal '0.225683'.to_f, @cf.xirr
     end
@@ -38,12 +68,9 @@ describe 'Cashflows' do
       assert_equal '1.0597572345993451e+284'.to_f, @cf.xirr
     end
 
-=begin
-    # FIXME Check why limit is not being enforced
-    it 'has an Internal Rate of Return on Bisection Method using a Guess' do
-      assert_equal '0.225683'.to_f, @cf.xirr(0.15)
+    it 'has an Internal Rate of Return on Bisection Method using a bad Guess' do
+      assert_raises(ArgumentError) { @cf.xirr(0.15) }
     end
-=end
 
     it 'has an Internal Rate of Return on Newton Method' do
       assert_equal '1.0597572345993451e+284'.to_f, @cf.xirr(nil, :newton_method)
@@ -63,6 +90,10 @@ describe 'Cashflows' do
 
     it 'is invalid' do
       assert_raises(ArgumentError) { @cf.valid? }
+    end
+
+    it 'with a wrong method is invalid' do
+      assert_raises(ArgumentError) { @cf.xirr(nil, :no_method) }
     end
 
     it 'raises error when xirr is called' do
