@@ -20,8 +20,7 @@ module Xirr
       while ((right - left).abs > Xirr::EPS && runs < Xirr.config.iteration_limit.to_i) do
 
         runs += 1
-        npv_positive?(midpoint) == npv_positive?(left) ? left = midpoint : right = midpoint
-        midpoint = format_irr(left, right)
+        left, midpoint, right = bisection(left, midpoint, right)
 
       end
 
@@ -34,6 +33,24 @@ module Xirr
     end
 
     private
+
+    # @param left [BigDecimal]
+    # @param midpoint [BigDecimal]
+    # @param right [BigDecimal]
+    # @return [Array]
+    # Calculates the Bisections
+    def bisection(left, midpoint, right)
+      _left, _mid = npv_positive?(left), npv_positive?(midpoint)
+      if _left && _mid
+        return left, left, left if npv_positive?(right) # Not Enough Precision in the left to find the IRR
+      else
+        if _left == _mid
+          return midpoint, format_irr(midpoint, right), right # Result is to the Right
+        else
+          return left, format_irr(left, midpoint), midpoint # Result is to the Left
+        end
+      end
+    end
 
     # @param midpoint [Float]
     # @return [Bolean]

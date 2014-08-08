@@ -1,7 +1,10 @@
+## Version 0.2.6
+
+* New Bisection method to avoid not converging to negative IRRs if not enough precision
+
 ## Version 0.2.5
 
 * Default XIRR does not raise an Exception if cashflow is invalid
-
 
 ## Version 0.2.4
 
