@@ -23,7 +23,7 @@ describe 'Cashflows' do
     end
 
     it 'has an Internal Rate of Return on Bisection Method using a Guess' do
-      assert_equal '0.225683'.to_f, @cf.xirr(0.15)
+      assert_in_delta 0.225683, @cf.xirr(0.15).to_f, 0.000002
     end
 
     it 'has an Internal Rate of Return on Newton Method' do
@@ -44,12 +44,16 @@ describe 'Cashflows' do
       @cf << Transaction.new(6000, date: '1995-01-01'.to_date)
     end
 
+    it 'has a sum of its transactions' do
+      assert_equal '5600'.to_f, @cf.sum
+    end
+
     it 'has an Internal Rate of Return on Bisection Method' do
       assert_equal '0.225683'.to_f, @cf.xirr
     end
 
     it 'has an Internal Rate of Return on Bisection Method using a Guess' do
-      assert_equal '0.225683'.to_f, @cf.xirr(0.15)
+      assert_in_delta 0.225683, @cf.xirr(0.15).to_f, 0.000002
     end
 
     it 'has an Internal Rate of Return on Newton Method' do
@@ -71,6 +75,10 @@ describe 'Cashflows' do
 
     it 'has an Internal Rate of Return on Bisection Method' do
       assert_equal '22.352206  '.to_f, @cf.xirr
+    end
+
+    it 'has a sum of its transactions' do
+      assert_equal '-2000000'.to_f, @cf.sum
     end
 
     it 'has an Internal Rate of Return on Newton Method' do

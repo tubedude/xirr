@@ -1,3 +1,7 @@
+## Version 0.2.8
+
+* Added missing tests
+
 ## Version 0.2.7
 
 * Bisection will now retry XIRR in Newton Method if right limit is reached
