@@ -28,11 +28,24 @@ module Xirr
         raise ArgumentError, "Did not converge after #{runs} tries."
       end
 
+      # If enabled, will retry XIRR with NewtonMethod
+      if Xirr::FALLBACK && right_limit_reached?(right, midpoint)
+        return NewtonMethod.new(cf).xirr
+      end
+
       return midpoint.round Xirr::PRECISION
 
     end
 
     private
+
+    # @param right [BigDecimal]
+    # @param midpoint [BigDecimal]
+    # @return [Boolean]
+    # Checks if result is the right limit.
+    def right_limit_reached?(right, midpoint)
+      (right - midpoint).abs < Xirr::EPS
+    end
 
     # @param left [BigDecimal]
     # @param midpoint [BigDecimal]
@@ -43,12 +56,11 @@ module Xirr
       _left, _mid = npv_positive?(left), npv_positive?(midpoint)
       if _left && _mid
         return left, left, left if npv_positive?(right) # Not Enough Precision in the left to find the IRR
+      end
+      if _left == _mid
+        return midpoint, format_irr(midpoint, right), right # Result is to the Right
       else
-        if _left == _mid
-          return midpoint, format_irr(midpoint, right), right # Result is to the Right
-        else
-          return left, format_irr(left, midpoint), midpoint # Result is to the Left
-        end
+        return left, format_irr(left, midpoint), midpoint # Result is to the Left
       end
     end
 

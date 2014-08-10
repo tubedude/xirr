@@ -1,12 +1,5 @@
 module Xirr
 
-  # Precision for BigDecimal
-  PRECISION = Xirr.config.precision.to_i
-  # Days in a year
-  DAYS_IN_YEAR = Xirr.config.days_in_year.to_f
-  # Epsilon: error margin
-  EPS = Xirr.config.eps.to_f
-
   #  Base module for XIRR calculation Methods
   module Base
     extend ActiveSupport::Concern

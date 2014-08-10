@@ -96,7 +96,7 @@ module Xirr
         when :newton_method
           NewtonMethod.new(self)
         else
-          raise ArgumentError, "There is no #{method} method"
+          raise ArgumentError, "There is no method called #{method} "
       end
     end
 

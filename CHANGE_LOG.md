@@ -1,3 +1,8 @@
+## Version 0.2.7
+
+* Bisection will now retry XIRR in Newton Method if right limit is reached
+* Options in config are now module constants
+
 ## Version 0.2.6
 
 * New Bisection method to avoid not converging to negative IRRs if not enough precision

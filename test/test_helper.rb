@@ -26,8 +26,9 @@ require_relative 'lib/xirr/cashflow.rb'
 require_relative 'lib/xirr/transaction.rb'
 include Xirr
   cf = Cashflow.new
-  cf << Transaction.new(1000, date: '1985-01-01'.to_date)
-  cf << Transaction.new(-6000, date: '1985-01-02'.to_date)
-  cf.xirr(0.15)
+  cf << Transaction.new(1000000, date: Date.today - 180)
+  cf << Transaction.new(-2200000, date: Date.today - 60)
+  cf << Transaction.new(-800000, date: Date.today - 30)
+  cf.xirr
 
 =end

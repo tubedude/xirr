@@ -61,6 +61,27 @@ describe 'Cashflows' do
     end
   end
 
+  describe 'of a very good investment' do
+    before(:all) do
+      @cf = Cashflow.new
+      @cf << Transaction.new(1000000, date: Date.today - 180)
+      @cf << Transaction.new(-2200000, date: Date.today - 60)
+      @cf << Transaction.new(-800000, date: Date.today - 30)
+    end
+
+    it 'has an Internal Rate of Return on Bisection Method' do
+      assert_equal '22.352206  '.to_f, @cf.xirr
+    end
+
+    it 'has an Internal Rate of Return on Newton Method' do
+      assert_equal '22.352206 '.to_f, @cf.xirr(nil, :newton_method)
+    end
+
+    it 'has an educated guess' do
+      assert_equal '13.488 '.to_f, @cf.irr_guess
+    end
+  end
+
   describe 'of a good investment' do
     before(:all) do
       @cf = Cashflow.new
@@ -97,16 +118,16 @@ describe 'Cashflows' do
     end
 
     it 'returns 0 instead of expection ' do
-      assert_equal BigDecimal.new(0, 6), @cf.xirr_no_exception
+      assert_equal BigDecimal.new(0, 6), @cf.xirr
     end
 
 
     it 'with a wrong method is invalid' do
-      assert_raises(ArgumentError) { @cf.xirr(nil, :no_method) }
+      assert_raises(ArgumentError) { @cf.xirr_with_exception(nil, :no_method) }
     end
 
     it 'raises error when xirr is called' do
-      assert_raises(ArgumentError) { @cf.xirr }
+      assert_raises(ArgumentError) { @cf.xirr_with_exception }
     end
 
     it 'raises error when xirr is called' do
@@ -127,7 +148,7 @@ describe 'Cashflows' do
     end
 
     it 'raises error when xirr is called' do
-      assert_raises(ArgumentError) { @cf.xirr }
+      assert_raises(ArgumentError) { @cf.xirr_with_exception }
     end
 
     it 'raises error when xirr is called' do
