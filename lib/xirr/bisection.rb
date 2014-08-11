@@ -13,6 +13,7 @@ module Xirr
       # Initial values
       left = [BigDecimal.new(-0.99, Xirr::PRECISION), cf.irr_guess].min
       right = [BigDecimal.new(9.99, Xirr::PRECISION), cf.irr_guess + 1].max
+      @original_right = right
       midpoint ||= cf.irr_guess
       runs = 0
 
@@ -29,7 +30,7 @@ module Xirr
       end
 
       # If enabled, will retry XIRR with NewtonMethod
-      if Xirr::FALLBACK && right_limit_reached?(midpoint, cf.irr_guess + 1)
+      if Xirr::FALLBACK && right_limit_reached?(midpoint)
         return NewtonMethod.new(cf).xirr
       end
 
@@ -43,8 +44,8 @@ module Xirr
     # @param midpoint [BigDecimal]
     # @return [Boolean]
     # Checks if result is the right limit.
-    def right_limit_reached?(midpoint, original_right)
-      (original_right - midpoint).abs < Xirr::EPS
+    def right_limit_reached?(midpoint)
+      (@original_right - midpoint).abs < Xirr::EPS
     end
 
     # @param left [BigDecimal]

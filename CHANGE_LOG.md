@@ -1,6 +1,7 @@
 ## Version 0.2.8
 
 * Added missing tests
+* Fixed Fallback method
 
 ## Version 0.2.7
 
