@@ -1,3 +1,7 @@
+## Version 0.2.9
+
+* Cashflow validation excludes zeros
+
 ## Version 0.2.8
 
 * Added missing tests
