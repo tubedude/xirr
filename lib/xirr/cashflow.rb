@@ -152,9 +152,8 @@ module Xirr
     # @see #negatives
     # Uses partition to separate the investment transactions Negatives and the income transactions (Positives)
     def split_transactions
-      @negatives, @positives = self.partition { |x| x.amount >= 0 } # Inverted as negative amount is good
+      @negatives, @positives = self.partition { |x| x.amount > 0 } # Inverted as negative amount is good
     end
-
 
   end
 

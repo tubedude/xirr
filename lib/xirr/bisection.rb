@@ -40,7 +40,6 @@ module Xirr
 
     private
 
-    # @param right [BigDecimal]
     # @param midpoint [BigDecimal]
     # @return [Boolean]
     # Checks if result is the right limit.
