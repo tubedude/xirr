@@ -3,6 +3,7 @@ module Xirr
   #  Base module for XIRR calculation Methods
   module Base
     extend ActiveSupport::Concern
+    require 'inline'
     attr_reader :cf
 
     # @param cf [Cashflow]
@@ -23,7 +24,25 @@ module Xirr
     def xnpv(rate)
       cf.inject(0) do |sum, t|
         sum += t.amount / (1 + rate) ** t_in_days(t.date)
+        # sum += xnpv_c rate, t.amount, t_in_days(t.date)
       end
+    end
+
+    # Net Present Value funtion that will be used to reduce the cashflow
+    # @param rate [BigDecimal]
+    def xnpv_new(rate)
+      cf.inject(0) do |sum, t|
+        # sum += t.amount / (1 + rate) ** t_in_days(t.date)
+        sum += xnpv_c rate, t.amount, t_in_days(t.date)
+      end
+    end
+
+    inline do |builder|
+      builder.include "<math.h>"
+      builder.c "
+        double xnpv_c(double rate, double amount, double days) {
+          return pow(amount / (1 + rate), days);
+        }"
     end
 
   end

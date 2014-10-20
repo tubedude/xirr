@@ -49,6 +49,5 @@ module Xirr
       nlsolve(func, rate)
       rate[0].round Xirr::PRECISION
     end
-
   end
 end

@@ -8,7 +8,8 @@ module Xirr
     # @return [BigDecimal]
     # @param midpoint [Float]
     # An initial guess rate will override the {Cashflow#irr_guess}
-    def xirr(midpoint = nil)
+    def xirr(midpoint = nil, c_method = :normal)
+      @c_method = c_method
 
       # Initial values
       left = [BigDecimal.new(-0.99, Xirr::PRECISION), cf.irr_guess].min
