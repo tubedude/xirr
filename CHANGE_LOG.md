@@ -1,3 +1,7 @@
+## Version 0.3.0
+
+* Moved XNPV function to C.
+
 ## Version 0.2.9
 
 * Cashflow validation excludes zeros
