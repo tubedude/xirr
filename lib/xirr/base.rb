@@ -23,8 +23,8 @@ module Xirr
     # @param rate [BigDecimal]
     def xnpv(rate)
       cf.inject(0) do |sum, t|
-        sum += t.amount / (1 + rate) ** t_in_days(t.date)
-        # sum += xnpv_c rate, t.amount, t_in_days(t.date)
+        # sum += t.amount / (1 + rate) ** t_in_days(t.date)
+        sum += xnpv_c rate, t.amount, t_in_days(t.date)
       end
     end
 
@@ -41,7 +41,7 @@ module Xirr
       builder.include "<math.h>"
       builder.c "
         double xnpv_c(double rate, double amount, double days) {
-          return pow(amount / (1 + rate), days);
+          return amount / pow(1 + rate, days);
         }"
     end
 
