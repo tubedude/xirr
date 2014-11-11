@@ -2,12 +2,16 @@ require_relative 'test_helper'
 
 describe 'Cashflows' do
 
-  describe 'of a ok investment' do
+  describe 'of an ok investment' do
     before(:all) do
       @cf = Cashflow.new
       @cf << Transaction.new(1000, date: '1985-01-01'.to_date)
       @cf << Transaction.new(-600, date: '1990-01-01'.to_date)
       @cf << Transaction.new(-6000, date: '1995-01-01'.to_date)
+    end
+
+    it 'has a sum of its transactions' do
+      assert_equal '-5600'.to_f, @cf.sum
     end
 
     it 'with a wrong method is invalid' do
@@ -18,12 +22,12 @@ describe 'Cashflows' do
       assert_equal '0.225683'.to_f, @cf.xirr
     end
 
-    it 'has an Internal Rate of Return on default Method' do
+    it 'has an Internal Rate of Return on Bisection Method' do
       assert_equal '0.225683'.to_f, @cf.xirr(nil, :bisection)
     end
 
     it 'has an Internal Rate of Return on Bisection Method using a Guess' do
-      assert_in_delta 0.225683, @cf.xirr(0.15).to_f, 0.000002
+      assert_in_delta '0.225683'.to_f, @cf.xirr(0.15).to_f, 0.000002
     end
 
     it 'has an Internal Rate of Return on Newton Method' do
@@ -49,11 +53,11 @@ describe 'Cashflows' do
     end
 
     it 'has an Internal Rate of Return on Bisection Method' do
-      assert_equal '0.225683'.to_f, @cf.xirr
+      assert_equal '0.225683'.to_f, @cf.xirr(nil, :bisection)
     end
 
     it 'has an Internal Rate of Return on Bisection Method using a Guess' do
-      assert_in_delta 0.225683, @cf.xirr(0.15).to_f, 0.000002
+      assert_in_delta '0.225683'.to_f, @cf.xirr(0.15).to_f, 0.000002
     end
 
     it 'has an Internal Rate of Return on Newton Method' do
@@ -74,7 +78,7 @@ describe 'Cashflows' do
     end
 
     it 'has an Internal Rate of Return on Bisection Method' do
-      assert_equal '22.352206  '.to_f, @cf.xirr
+      assert_equal '22.352206  '.to_f, @cf.xirr(nil, :bisection)
     end
 
     it 'has a sum of its transactions' do
@@ -98,11 +102,11 @@ describe 'Cashflows' do
     end
 
     it 'has an Internal Rate of Return on Bisection Method' do
-      assert_equal '1.0597572345993451e+284'.to_f, @cf.xirr
+      assert_equal '1.0597572345993451e+284'.to_f, @cf.xirr(nil, :bisection)
     end
 
     it 'has an Internal Rate of Return on Bisection Method using a bad Guess' do
-      assert_raises(ArgumentError) { @cf.xirr(0.15) }
+      assert_raises(ArgumentError) { @cf.xirr(0.15, :bisection) }
     end
 
     it 'has an Internal Rate of Return on Newton Method' do
@@ -155,11 +159,11 @@ describe 'Cashflows' do
       assert true, !@cf.valid?
     end
 
-    it 'raises error when xirr is called' do
+    it 'raises error when #xirr is called' do
       assert_raises(ArgumentError) { @cf.xirr_with_exception }
     end
 
-    it 'raises error when xirr is called' do
+    it 'is invalid when #irr_guess is called' do
       assert true, !@cf.irr_guess
     end
   end
@@ -195,7 +199,7 @@ describe 'Cashflows' do
     end
 
     it 'has an Internal Rate of Return on Bisection Method' do
-      assert_equal '0.112339'.to_f, @cf.xirr
+      assert_equal '0.112339'.to_f, @cf.xirr(nil, :bisection)
     end
 
     it 'has an Internal Rate of Return on Newton Method' do
