@@ -7,11 +7,12 @@ module Xirr
       days_in_year: 365,
       iteration_limit: 50,
       precision: 6,
-      default_method: :bisection,
+      # default_method: :bisection,
+      default_method: :newton_method,
       fallback: true
   }
 
-  # Iterates trhough default values and sets in config
+  # Iterates though default values and sets in config
   default_values.each do |key, value|
     self.config.send("#{key.to_sym}=", value)
     const_set key.to_s.upcase.to_sym, value

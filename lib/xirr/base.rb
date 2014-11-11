@@ -21,6 +21,7 @@ module Xirr
 
     # Net Present Value funtion that will be used to reduce the cashflow
     # @param rate [BigDecimal]
+    # @return [BigDecimal]
     def xnpv(rate)
       cf.inject(0) do |sum, t|
         # sum += t.amount / (1 + rate) ** t_in_days(t.date)
@@ -28,13 +29,13 @@ module Xirr
       end
     end
 
-    inline do |builder|
+    inline { |builder|
       builder.include "<math.h>"
       builder.c "
         double xnpv_c(double rate, double amount, double days) {
           return amount / pow(1 + rate, days);
         }"
-    end
+    }
 
   end
 end
