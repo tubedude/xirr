@@ -32,7 +32,8 @@ module Xirr
 
       # If enabled, will retry XIRR with NewtonMethod
       if Xirr::FALLBACK && right_limit_reached?(midpoint)
-        return NewtonMethod.new(cf).xirr
+        # return NewtonMethod.new(cf).xirr
+        return nil
       end
 
       return midpoint.round Xirr::PRECISION

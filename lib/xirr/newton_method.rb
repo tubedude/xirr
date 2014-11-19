@@ -11,10 +11,10 @@ module Xirr
     class Function
       values = {
           eps: Xirr::EPS,
-          one: "1.0",
-          two: "2.0",
-          ten: "10.0",
-          zero: "0.0"
+          one:  '1.0',
+          two:  '2.0',
+          ten:  '10.0',
+          zero: '0.0'
       }
 
       # define default values
@@ -46,8 +46,12 @@ module Xirr
     def xirr(guess=nil)
       func = Function.new(self, :xnpv)
       rate = [guess || cf.irr_guess.to_f]
-      nlsolve(func, rate)
-      rate[0].round Xirr::PRECISION
+      begin
+        nlsolve(func, rate)
+        rate[0].round Xirr::PRECISION
+      rescue
+        nil
+      end
     end
   end
 end

@@ -212,4 +212,49 @@ describe 'Cashflows' do
 
   end
 
+  describe 'of a real case' do
+    before(:all) do
+      @cf = Cashflow.new
+      @cf << Transaction.new(105187.06, date: '2011-12-07'.to_date)
+      @cf << Transaction.new(816709.66, date: '2011-12-07'.to_date)
+      @cf << Transaction.new(479069.684, date: '2011-12-07'.to_date)
+      @cf << Transaction.new(937309.708, date: '2012-01-18'.to_date)
+      @cf << Transaction.new(88622.661, date: '2012-07-03'.to_date)
+      @cf << Transaction.new(100000.0, date: '2012-07-03'.to_date)
+      @cf << Transaction.new(80000.0, date: '2012-07-19'.to_date)
+      @cf << Transaction.new(403627.95, date: '2012-07-23'.to_date)
+      @cf << Transaction.new(508117.9, date: '2012-07-23'.to_date)
+      @cf << Transaction.new(789706.87, date: '2012-07-23'.to_date)
+      @cf << Transaction.new(-88622.661, date: '2012-09-11'.to_date)
+      @cf << Transaction.new(-789706.871, date: '2012-09-11'.to_date)
+      @cf << Transaction.new(-688117.9, date: '2012-09-11'.to_date)
+      @cf << Transaction.new(-403627.95, date: '2012-09-11'.to_date)
+      @cf << Transaction.new(403627.95, date: '2012-09-12'.to_date)
+      @cf << Transaction.new(789706.871, date: '2012-09-12'.to_date)
+      @cf << Transaction.new(88622.661, date: '2012-09-12'.to_date)
+      @cf << Transaction.new(688117.9, date: '2012-09-12'.to_date)
+      @cf << Transaction.new(45129.14, date: '2013-03-11'.to_date)
+      @cf << Transaction.new(26472.08, date: '2013-03-11'.to_date)
+      @cf << Transaction.new(51793.2, date: '2013-03-11'.to_date)
+      @cf << Transaction.new(126605.59, date: '2013-03-11'.to_date)
+      @cf << Transaction.new(278532.29, date: '2013-03-28'.to_date)
+      @cf << Transaction.new(99284.1, date: '2013-03-28'.to_date)
+      @cf << Transaction.new(58238.57, date: '2013-03-28'.to_date)
+      @cf << Transaction.new(113945.03, date: '2013-03-28'.to_date)
+      @cf << Transaction.new(405137.88, date: '2013-05-21'.to_date)
+      @cf << Transaction.new(-405137.88, date: '2013-05-21'.to_date)
+      @cf << Transaction.new(165738.23, date: '2013-05-21'.to_date)
+      @cf << Transaction.new(-165738.23, date: '2013-05-21'.to_date)
+      @cf << Transaction.new(144413.24, date: '2013-05-21'.to_date)
+      @cf << Transaction.new(84710.65, date: '2013-05-21'.to_date)
+      @cf << Transaction.new(-84710.65, date: '2013-05-21'.to_date)
+      @cf << Transaction.new(-144413.24, date: '2013-05-21'.to_date)
+    end
+
+    it 'has an Internal Rate of Return on Newton Method HERE' do
+      assert_equal '-0.99'.to_f, @cf.xirr(nil, :newton_method)
+    end
+
+  end
+
 end

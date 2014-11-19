@@ -19,7 +19,7 @@ module Xirr
       (date - cf.min_date) / Xirr::DAYS_IN_YEAR
     end
 
-    # Net Present Value funtion that will be used to reduce the cashflow
+    # Net Present Value function that will be used to reduce the cashflow
     # @param rate [BigDecimal]
     # @return [BigDecimal]
     def xnpv(rate)
@@ -30,11 +30,11 @@ module Xirr
     end
 
     inline { |builder|
-      builder.include "<math.h>"
-      builder.c "
+      builder.include '<math.h>'
+      builder.c '
         double xnpv_c(double rate, double amount, double days) {
           return amount / pow(1 + rate, days);
-        }"
+        }'
     }
 
   end

@@ -1,3 +1,7 @@
+## Version 0.3.1
+
+* Added fallback to secondary calculation method.
+
 ## Version 0.3.0
 
 * Moved XNPV function to C.

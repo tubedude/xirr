@@ -49,10 +49,10 @@ module Xirr
     # @param guess [Float]
     # @param method [Symbol]
     # @return [Float]
-    # Finds the XIRR according to the method provided. Default to Bisection
+    # Finds the XIRR according to the method provided.
     def xirr_with_exception(guess = nil, method = Xirr.config.default_method)
       if valid?
-        choose_(method).send :xirr, guess
+        choose_(method).send(:xirr, guess) || choose_(method == :newton_method ? :bisection : :newton_method).send(:xirr, guess)
       else
         raise ArgumentError, invalid_message
       end
@@ -103,7 +103,7 @@ module Xirr
     # @api private
     # Sorts the {Cashflow} by date ascending
     #   and finds the signal of the first transaction.
-    # This implies the first transaction is a disembursement
+    # This implies the first transaction is a disbursement
     # @return [Integer]
     def first_transaction_direction
       self.sort! { |x, y| x.date <=> y.date }
