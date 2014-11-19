@@ -129,7 +129,7 @@ describe 'Cashflows' do
       assert true, !@cf.valid?
     end
 
-    it 'returns 0 instead of expection ' do
+    it 'returns 0 instead of exception ' do
       assert_equal BigDecimal.new(0, 6), @cf.xirr
     end
 
@@ -193,9 +193,7 @@ describe 'Cashflows' do
 
   describe 'of a long investment' do
     before(:all) do
-      @cf = Cashflow.new
-      @cf << Transaction.new(-1000, date: Date.new(1957, 1, 1))
-      @cf << Transaction.new(390000, date: Date.new(2013, 1, 1))
+      @cf = Cashflow.new false, Transaction.new(-1000, date: Date.new(1957, 1, 1)), Transaction.new(390000, date: Date.new(2013, 1, 1))
     end
 
     it 'has an Internal Rate of Return on Bisection Method' do
@@ -208,6 +206,25 @@ describe 'Cashflows' do
 
     it 'has an educated guess' do
       assert_equal 0.112, @cf.irr_guess.round(6)
+    end
+
+  end
+
+  describe 'reapeated cashflow' do
+    before(:all) do
+      @cf = Cashflow.new
+      @cf << Transaction.new(1000.0, date: '2011-12-07'.to_date)
+      @cf << Transaction.new(2000.0, date: '2011-12-07'.to_date)
+      @cf << Transaction.new(-2000.0, date: '2013-05-21'.to_date)
+      @cf << Transaction.new(-4000.0, date: '2013-05-21'.to_date)
+    end
+
+    it 'has a compact cashflow' do
+      assert_equal 2, @cf.compact_cf.count
+    end
+
+    it 'sums all transactions' do
+      assert_equal -3000.0, @cf.compact_cf.map(&:amount).inject(&:+)
     end
 
   end
@@ -249,10 +266,30 @@ describe 'Cashflows' do
       @cf << Transaction.new(84710.65, date: '2013-05-21'.to_date)
       @cf << Transaction.new(-84710.65, date: '2013-05-21'.to_date)
       @cf << Transaction.new(-144413.24, date: '2013-05-21'.to_date)
+
     end
 
-    it 'has an Internal Rate of Return on Newton Method HERE' do
+    it 'is a long and bad investment and newton generates an error' do
       assert_equal '-0.99'.to_f, @cf.xirr(nil, :newton_method)
+    end
+
+    it 'compacted ' do
+      cf = @cf
+      cf << Transaction.new(-1000000.0, date: '2013-05-21'.to_date)
+      assert_kind_of(Cashflow, cf.compact_cf)
+      assert_equal -0.885744, cf.xirr(nil, :newton_method, true)
+      assert_equal -0.885744, cf.xirr(nil, :bisection, true)
+    end
+
+    it 'has zero for years of investment' do
+      cf = Cashflow.new false, Transaction.new(105187.06, date: '2011-12-07'.to_date), Transaction.new(-105187.06 * 1.0697668105671994, date: '2011-12-07'.to_date)
+      assert_equal 0.0, cf.irr_guess
+      assert_equal Xirr.config.replace_for_nil, cf.xirr(nil, :newton_method)
+    end
+
+    it 'has is valid even if compacted' do
+      cf = Cashflow.new false, Transaction.new(100, date: Date.today), Transaction.new(-100, date: Date.today)
+      assert_equal 0.0, cf.xirr(nil, :newton_method, true)
     end
 
   end

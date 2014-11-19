@@ -1,3 +1,9 @@
+## Version 0.4.0
+
+* Xirr returns nil and there is now a default settings to replace nil rate.
+* It will compact the flow automatically, unless specified in the defaults.
+* Attention to the new way, the Cashflow is created. Cashflow.new requires a Compacted boolean before the array of flow.
+
 ## Version 0.3.1
 
 * Added fallback to secondary calculation method.
