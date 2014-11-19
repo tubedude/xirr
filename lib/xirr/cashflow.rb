@@ -52,6 +52,7 @@ module Xirr
     # Calculates a simple IRR guess based on period of investment and multiples.
     # @return [Float]
     def irr_guess
+      return @irr_guess = 0.0 if years_of_investment.zero?
       @irr_guess = valid? ? ((multiple ** (1 / years_of_investment)) - 1).round(3) : false
       @irr_guess == 1.0/0 ? 0.0 : @irr_guess
     end

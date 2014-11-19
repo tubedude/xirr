@@ -1,3 +1,6 @@
+## Version 0.4.1
+* Added verification to pass on ruby 2.0.0
+
 ## Version 0.4.0
 
 * Xirr returns nil and there is now a default settings to replace nil rate.
