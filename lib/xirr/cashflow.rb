@@ -130,29 +130,17 @@ module Xirr
     # @api private
     # @return [Array]
     # @see #negatives
-    # @see #split_transactions
-    # Finds all transactions income from Cashflow
+    # Selects all positives transactions from Cashflow
     def positives
-      split_transactions
-      @positives
+      @positives ||= self.select { |x| x.amount < 0 }
     end
 
     # @api private
     # @return [Array]
     # @see #positives
-    # @see #split_transactions
-    # Finds all transactions investments from Cashflow
+    # Selects all negatives transactions from Cashflow
     def negatives
-      split_transactions
-      @negatives
-    end
-
-    # @api private
-    # @see #positives
-    # @see #negatives
-    # Uses partition to separate the investment transactions Negatives and the income transactions (Positives)
-    def split_transactions
-      @negatives, @positives = self.partition { |x| x.amount > 0 } # Inverted as negative amount is good
+      @negatives ||= self.select { |x| x.amount > 0 }
     end
 
   end
