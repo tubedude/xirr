@@ -193,7 +193,7 @@ describe 'Cashflows' do
 
   describe 'of a long investment' do
     before(:all) do
-      @cf = Cashflow.new false, Transaction.new(-1000, date: Date.new(1957, 1, 1)), Transaction.new(390000, date: Date.new(2013, 1, 1))
+      @cf = Cashflow.new Xirr::DAYS_IN_YEAR, false, Transaction.new(-1000, date: Date.new(1957, 1, 1)), Transaction.new(390000, date: Date.new(2013, 1, 1))
     end
 
     it 'has an Internal Rate of Return on Bisection Method' do
@@ -282,14 +282,19 @@ describe 'Cashflows' do
     end
 
     it 'has zero for years of investment' do
-      cf = Cashflow.new false, Transaction.new(105187.06, date: '2011-12-07'.to_date), Transaction.new(-105187.06 * 1.0697668105671994, date: '2011-12-07'.to_date)
+      cf = Cashflow.new Xirr::DAYS_IN_YEAR, false, Transaction.new(105187.06, date: '2011-12-07'.to_date), Transaction.new(-105187.06 * 1.0697668105671994, date: '2011-12-07'.to_date)
       assert_equal 0.0, cf.irr_guess
       assert_equal Xirr.config.replace_for_nil, cf.xirr(nil, :newton_method)
     end
 
     it 'has is valid even if compacted' do
-      cf = Cashflow.new false, Transaction.new(100, date: Date.today), Transaction.new(-100, date: Date.today)
+      cf = Cashflow.new Xirr::DAYS_IN_YEAR, false, Transaction.new(100, date: Date.today), Transaction.new(-100, date: Date.today)
       assert_equal 0.0, cf.xirr(nil, :newton_method, true)
+    end
+
+    it 'respects a different period' do
+      cf = Cashflow.new 100, false, Transaction.new(-1000, date: Date.new(1957, 1, 1)), Transaction.new(390000, date: Date.new(2013, 1, 1))
+      assert_equal 0.029598, cf.xirr
     end
 
   end
