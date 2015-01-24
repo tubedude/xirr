@@ -3,6 +3,7 @@ module Xirr
   # Expands [Array] to store a set of transactions which will be used to calculate the XIRR
   # @note A Cashflow should consist of at least two transactions, one positive and one negative.
   class Cashflow < Array
+    attr_reader :period
 
     # @param args [Transaction]
     # @example Creating a Cashflow
@@ -11,8 +12,9 @@ module Xirr
     #   cf << Transaction.new(-1234, date: '2013-03-31'.to_date)
     #   Or
     #   cf = Cashflow.new Transaction.new( 1000, date: '2013-01-01'.to_date), Transaction.new(-1234, date: '2013-03-31'.to_date)
-    def initialize(compacted = false, *args)
+    def initialize(period = Xirr::DAYS_IN_YEAR, compacted = false, *args)
       @compacted = compacted
+      @period = period
       args.each { |a| self << a }
       self.flatten!
     end
@@ -75,7 +77,7 @@ module Xirr
       compact = Hash.new
       uniq_dates.each { |date| compact[date] = 0 }
       self.each { |flow| compact[flow.date] += flow.amount }
-      Cashflow.new(true, compact.map { |key, value| Transaction.new(value, date: key.to_date) })
+      Cashflow.new(Xirr::DAYS_IN_YEAR, true, compact.map { |key, value| Transaction.new(value, date: key.to_date) })
     end
 
     # Calls XIRR but throws no exception and returns with 0

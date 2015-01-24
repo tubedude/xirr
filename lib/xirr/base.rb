@@ -16,7 +16,7 @@ module Xirr
     # @return [Rational]
     # @param date [Date]
     def t_in_days(date)
-      (date - cf.min_date) / Xirr::DAYS_IN_YEAR
+      (date - cf.min_date) / cf.period
     end
 
     # Net Present Value function that will be used to reduce the cashflow
