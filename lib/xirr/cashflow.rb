@@ -3,6 +3,7 @@ module Xirr
   # Expands [Array] to store a set of transactions which will be used to calculate the XIRR
   # @note A Cashflow should consist of at least two transactions, one positive and one negative.
   class Cashflow < Array
+    attr_reader :days_in_year
 
     # @param args [Transaction]
     # @example Creating a Cashflow
@@ -11,14 +12,15 @@ module Xirr
     #   cf << Transaction.new(-1234, date: '2013-03-31'.to_date)
     #   Or
     #   cf = Cashflow.new Transaction.new( 1000, date: '2013-01-01'.to_date), Transaction.new(-1234, date: '2013-03-31'.to_date)
-    def initialize(compacted = false, *args)
-      @compacted = compacted
-      args.each { |a| self << a }
+    def initialize(flow: [], days_in_year: Xirr::DAYS_IN_YEAR, compact: false, ** options)
+      @compact      = compact
+      @days_in_year = days_in_year
+      flow.each { |a| self << a }
       self.flatten!
     end
 
-    def compacted?
-      @compacted && self.count > uniq_dates.count
+    def compact?
+      @compact && self.count > uniq_dates.count
     end
 
     def uniq_dates
@@ -67,17 +69,6 @@ module Xirr
       xirr.nil? ? Xirr.config.replace_for_nil : xirr
     end
 
-    def other_calculation_method(method)
-      method == :newton_method ? :bisection : :newton_method
-    end
-
-    def compact_cf
-      compact = Hash.new
-      uniq_dates.each { |date| compact[date] = 0 }
-      self.each { |flow| compact[flow.date] += flow.amount }
-      Cashflow.new(true, compact.map { |key, value| Transaction.new(value, date: key.to_date) })
-    end
-
     # Calls XIRR but throws no exception and returns with 0
     # @param guess [Float]
     # @param method [Symbol]
@@ -90,6 +81,16 @@ module Xirr
       end
     end
 
+    def other_calculation_method(method)
+      method == :newton_method ? :bisection : :newton_method
+    end
+
+    def compact_cf
+      compact = Hash.new
+      uniq_dates.each { |date| compact[date] = 0 }
+      self.each { |flow| compact[flow.date] += flow.amount }
+      Cashflow.new(compact: true, flow: compact.map { |key, value| Transaction.new(value, date: key.to_date) })
+    end
 
     # First investment date
     # @return [Time]
@@ -112,9 +113,9 @@ module Xirr
     def choose_(method, compact)
       case method
         when :bisection
-          Bisection.new(compact && compacted? ? compact_cf : self)
+          Bisection.new(compact && compact? ? compact_cf : self)
         when :newton_method
-          NewtonMethod.new(compact && compacted? ? compact_cf : self)
+          NewtonMethod.new(compact && compact? ? compact_cf : self)
         else
           raise ArgumentError, "There is no method called #{method} "
       end
