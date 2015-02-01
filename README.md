@@ -30,6 +30,15 @@ Or install it yourself as:
     cf.xirr
     # 0.25159694345042327 # [BigDecimal]
 
+    flow = []
+    flow << Transaction.new(-1000,  date: '2014-01-01'.to_date)
+    flow << Transaction.new(-2000,  date: '2014-03-01'.to_date)
+    flow << Transaction.new( 4500, date: '2015-12-01'.to_date)
+
+    cf = Cashflow.new flow: flow
+    cf.xirr
+
+
 ## Configuration
 
     # intializer/xirr.rb

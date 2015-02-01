@@ -26,7 +26,7 @@ module Xirr
 
       # @param transactions [Cashflow]
       # @param function [Symbol]
-      # Initializes the Function with the Cashflow it will use as data source and the funcion to reduce it.
+      # Initializes the Function with the Cashflow it will use as data source and the function to reduce it.
       def initialize(transactions, function)
         @transactions = transactions
         @function = function
@@ -43,9 +43,9 @@ module Xirr
     # Calculates XIRR using Newton method
     # @return [BigDecimal]
     # @param guess [Float]
-    def xirr(guess=nil)
+    def xirr guess
       func = Function.new(self, :xnpv)
-      rate = [guess || cf.irr_guess.to_f]
+      rate = [guess || cf.irr_guess]
       begin
         nlsolve(func, rate)
         rate[0].round Xirr::PRECISION

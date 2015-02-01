@@ -3,7 +3,7 @@ module Xirr
   # Expands [Array] to store a set of transactions which will be used to calculate the XIRR
   # @note A Cashflow should consist of at least two transactions, one positive and one negative.
   class Cashflow < Array
-    attr_reader :days_in_year
+    attr_reader :period, :raise_exception
 
     # @param args [Transaction]
     # @example Creating a Cashflow
@@ -12,19 +12,20 @@ module Xirr
     #   cf << Transaction.new(-1234, date: '2013-03-31'.to_date)
     #   Or
     #   cf = Cashflow.new Transaction.new( 1000, date: '2013-01-01'.to_date), Transaction.new(-1234, date: '2013-03-31'.to_date)
-    def initialize(flow: [], days_in_year: Xirr::DAYS_IN_YEAR, compact: false, ** options)
-      @compact      = compact
-      @days_in_year = days_in_year
+    def initialize(flow: [], period: Xirr::PERIOD, ** options)
+      @period   = period
+      @fallback = options[:fallback]
+      @options  = options
       flow.each { |a| self << a }
       self.flatten!
     end
 
-    def compact?
-      @compact && self.count > uniq_dates.count
+    def compactable?
+      self.count < uniq_dates.count
     end
 
     def uniq_dates
-      @uniq_dates = self.map(&:date).uniq
+      @uniq_dates ||= self.map(&:date).uniq
     end
 
     # Check if Cashflow is invalid
@@ -51,33 +52,49 @@ module Xirr
       @max_date ||= self.map(&:date).max
     end
 
+    def fallback
+      if @fallback.nil?
+        Xirr::FALLBACK
+      else
+        @fallback
+      end
+    end
+
     # Calculates a simple IRR guess based on period of investment and multiples.
     # @return [Float]
     def irr_guess
-      return @irr_guess = 0.0 if years_of_investment.zero?
-      @irr_guess = valid? ? ((multiple ** (1 / years_of_investment)) - 1).round(3) : false
+      return @irr_guess = 0.0 if periods_of_investment.zero?
+      @irr_guess = valid? ? ((multiple ** (1 / periods_of_investment)) - 1).round(3) : false
       @irr_guess == 1.0/0 ? 0.0 : @irr_guess
     end
 
     # @param guess [Float]
     # @param method [Symbol]
     # @return [Float]
-    # Finds the XIRR according to the method provided.
-    def xirr_with_exception(guess = nil, method = Xirr.config.default_method, compact = Xirr.config.compact)
-      raise ArgumentError, invalid_message if invalid?
-      xirr = choose_(method, compact).send(:xirr, guess) || choose_(other_calculation_method(method), compact).send(:xirr, guess)
-      xirr.nil? ? Xirr.config.replace_for_nil : xirr
-    end
-
-    # Calls XIRR but throws no exception and returns with 0
-    # @param guess [Float]
-    # @param method [Symbol]
-    # @return [Float]
-    def xirr(guess = nil, method = Xirr.config.default_method, compact = Xirr.config.compact)
+    def xirr(guess: nil, method: nil, raise_exception: Xirr::RAISE_EXCEPTION)
+      method           = switch_fallback method
+      @raise_exception = raise_exception
       if invalid?
+        raise ArgumentError, invalid_message if raise_exception
         BigDecimal.new(0, Xirr::PRECISION)
       else
-        xirr_with_exception(guess, method, compact)
+        xirr = choose_(method).send :xirr, guess
+        xirr = choose_(other_calculation_method(method)).send(:xirr, guess) if xirr.nil? && fallback
+        xirr.nil? ? Xirr::REPLACE_FOR_NIL : xirr
+      end
+    end
+
+    # If method is defined it will turn off fallback
+    # it return either the provided method or the system default
+    # @param method [Symbol]
+    # @return [Symbol]
+    def switch_fallback method
+      if method
+        @fallback = false
+        method
+      else
+        @fallback = Xirr::FALLBACK
+        Xirr::DEFAULT_METHOD
       end
     end
 
@@ -86,10 +103,10 @@ module Xirr
     end
 
     def compact_cf
-      compact = Hash.new
-      uniq_dates.each { |date| compact[date] = 0 }
+      # self
+      compact = Hash.new 0
       self.each { |flow| compact[flow.date] += flow.amount }
-      Cashflow.new(compact: true, flow: compact.map { |key, value| Transaction.new(value, date: key.to_date) })
+      Cashflow.new flow: compact.map { |key, value| Transaction.new(value, date: key) }, period: period, options: @options
     end
 
     # First investment date
@@ -110,12 +127,12 @@ module Xirr
     # @param method [Symbol]
     # Choose a Method to call.
     # @return [Class]
-    def choose_(method, compact)
+    def choose_(method)
       case method
         when :bisection
-          Bisection.new(compact && compact? ? compact_cf : self)
+          Bisection.new compact_cf
         when :newton_method
-          NewtonMethod.new(compact && compact? ? compact_cf : self)
+          NewtonMethod.new compact_cf
         else
           raise ArgumentError, "There is no method called #{method} "
       end
@@ -144,8 +161,8 @@ module Xirr
     # @api private
     # Counts how many years from first to last transaction in the cashflow
     # @return
-    def years_of_investment
-      (max_date - min_date) / (365.0)
+    def periods_of_investment
+      (max_date - min_date) / period
     end
 
     # @api private
@@ -153,7 +170,9 @@ module Xirr
     # @see #negatives
     # Selects all positives transactions from Cashflow
     def positives
-      @positives ||= self.select { |x| x.amount < 0 }
+      return @positives if @positives
+      @positives, @negatives = self.partition { |x| x.amount < 0 }
+      @positives
     end
 
     # @api private
@@ -161,7 +180,9 @@ module Xirr
     # @see #positives
     # Selects all negatives transactions from Cashflow
     def negatives
-      @negatives ||= self.select { |x| x.amount > 0 }
+      return @negatives if @negatives
+      @negatives, @positives= self.partition { |x| x.amount > 0 }
+      @negatives
     end
 
   end

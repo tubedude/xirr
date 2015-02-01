@@ -8,8 +8,7 @@ module Xirr
     # @return [BigDecimal]
     # @param midpoint [Float]
     # An initial guess rate will override the {Cashflow#irr_guess}
-    def xirr(midpoint = nil, c_method = :normal)
-      @c_method = c_method
+    def xirr midpoint
 
       # Initial values
       left = [BigDecimal.new(-0.99, Xirr::PRECISION), cf.irr_guess].min
@@ -18,23 +17,32 @@ module Xirr
       midpoint ||= cf.irr_guess
       runs = 0
 
-      # Loops until difference is within error margin
-      while ((right - left).abs > Xirr::EPS && runs < Xirr.config.iteration_limit.to_i) do
-
+      while (right - left).abs > Xirr::EPS && runs < Xirr::ITERATION_LIMIT do
         runs += 1
-        left, midpoint, right = bisection(left, midpoint, right)
-
+        left, midpoint, right, should_stop = bisection(left, midpoint, right)
+        break if should_stop
+        if right_limit_reached?(midpoint)
+          right           = right * 2
+          @original_right = @original_right * 2
+        end
       end
 
-      if runs >= Xirr.config.iteration_limit.to_i
-        raise ArgumentError, "Did not converge after #{runs} tries."
+      #
+      # # Loops until difference is within error margin
+      # while (right - left).abs > Xirr::EPS && runs < Xirr::ITERATION_LIMIT do
+      #
+      #
+      # end
+
+      if runs >= Xirr::ITERATION_LIMIT
+        if cf.raise_exception
+          raise ArgumentError, "Did not converge after #{runs} tries."
+        else
+          return nil
+        end
       end
 
-      # If enabled, will retry XIRR with NewtonMethod
-      if Xirr::FALLBACK && right_limit_reached?(midpoint)
-        # return NewtonMethod.new(cf).xirr
-        return nil
-      end
+      # return nil if right_limit_reached?(midpoint)
 
       return midpoint.round Xirr::PRECISION
 
@@ -57,12 +65,12 @@ module Xirr
     def bisection(left, midpoint, right)
       _left, _mid = npv_positive?(left), npv_positive?(midpoint)
       if _left && _mid
-        return left, left, left if npv_positive?(right) # Not Enough Precision in the left to find the IRR
+        return left, left, left, true if npv_positive?(right) # Not Enough Precision in the left to find the IRR
       end
       if _left == _mid
-        return midpoint, format_irr(midpoint, right), right # Result is to the Right
+        return midpoint, format_irr(midpoint, right), right, false # Result is to the Right
       else
-        return left, format_irr(left, midpoint), midpoint # Result is to the Left
+        return left, format_irr(left, midpoint), midpoint, false # Result is to the Left
       end
     end
 

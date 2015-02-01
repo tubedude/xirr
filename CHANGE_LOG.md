@@ -1,3 +1,10 @@
+## Version 0.5.0
+* This update will break the old Cashflow initializer
+* Adds named attributes to Cashflow Initializer
+* Allows specific configuration to initializer such as: period, flow (array of transactions)
+* Calling xirr with a guess now requires named attribute
+* If a method is provided, it won't fall back to the secondary method
+
 ## Version 0.4.1
 * Added verification to pass on ruby 2.0.0
 

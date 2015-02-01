@@ -4,13 +4,14 @@ module Xirr
   # Sets as constants all the entries in the Hash Default values
   default_values = {
       eps:             '1.0e-6'.to_f,
-      days_in_year:    365.0,
+      period:          365.0,
       iteration_limit: 50,
       precision:       6,
       default_method:  :newton_method,
       fallback:        true,
       replace_for_nil: 0.0,
-      compact:         true
+      compact:         false,
+      raise_exception: false
   }
 
   # Iterates though default values and sets in config
