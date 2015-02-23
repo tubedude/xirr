@@ -1,3 +1,6 @@
+## Version 0.5.1
+* Newton Method will return nil if result is less than 100%
+
 ## Version 0.5.0
 * This update will break the old Cashflow initializer
 * Adds named attributes to Cashflow Initializer
