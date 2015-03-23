@@ -282,6 +282,17 @@ describe 'Cashflows' do
 
   end
 
+  describe 'xichen27' do
+    it 'it matchs Excel' do
+      cf = Cashflow.new
+      cf << Transaction.new(-10000, date: '2014-04-15'.to_date)
+      cf << Transaction.new(-305.6, date: '2014-05-15'.to_date)
+      cf << Transaction.new(500, date: '2014-10-19'.to_date)
+      assert_equal '-0.996814607'.to_f.round(3), cf.xirr.to_f.round(3)
+    end
+
+  end
+
   describe 'period' do
 
     it 'has zero for years of investment' do
