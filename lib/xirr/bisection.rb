@@ -11,8 +11,8 @@ module Xirr
     def xirr midpoint
 
       # Initial values
-      left = [BigDecimal.new(-0.99, Xirr::PRECISION), cf.irr_guess].min
-      right = [BigDecimal.new(9.99, Xirr::PRECISION), cf.irr_guess + 1].max
+      left  = [BigDecimal.new(-0.99999999, Xirr::PRECISION), cf.irr_guess].min
+      right = [BigDecimal.new(9.99999999, Xirr::PRECISION), cf.irr_guess + 1].max
       @original_right = right
       midpoint ||= cf.irr_guess
       runs = 0

@@ -277,7 +277,7 @@ describe 'Cashflows' do
     end
 
     it 'is a long and bad investment and newton generates an error' do
-      assert_equal '-0.99'.to_f, @cf.xirr #(method: :newton_method)
+      assert_equal '-1.0'.to_f, @cf.xirr #(method: :newton_method)
     end
 
   end
@@ -286,7 +286,7 @@ describe 'Cashflows' do
     it 'it matchs Excel' do
       cf = Cashflow.new
       cf << Transaction.new(-10000, date: '2014-04-15'.to_date)
-      cf << Transaction.new(-305.6, date: '2014-05-15'.to_date)
+      cf << Transaction.new(305.6, date: '2014-05-15'.to_date)
       cf << Transaction.new(500, date: '2014-10-19'.to_date)
       assert_equal '-0.996814607'.to_f.round(3), cf.xirr.to_f.round(3)
     end

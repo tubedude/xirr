@@ -10,7 +10,7 @@ module Xirr
       default_method:  :newton_method,
       fallback:        true,
       replace_for_nil: 0.0,
-      compact:         false,
+      compact: true,
       raise_exception: false
   }
 

@@ -16,7 +16,7 @@ module Xirr
       @period   = period
       @fallback = options[:fallback]
       @options  = options
-      flow.each { |a| self << a }
+      self << flow
       self.flatten!
     end
 
@@ -155,7 +155,11 @@ module Xirr
     # @return [Float]
     def multiple
       result = positives.sum(&:amount) / -negatives.sum(&:amount)
-      first_transaction_direction > 0 ? result : 1 / result
+      first_transaction_positive? ? result : 1 / result
+    end
+
+    def first_transaction_positive?
+      first_transaction_direction > 0
     end
 
     # @api private
@@ -171,7 +175,7 @@ module Xirr
     # Selects all positives transactions from Cashflow
     def positives
       return @positives if @positives
-      @positives, @negatives = self.partition { |x| x.amount < 0 }
+      extract_positives_and_negatives
       @positives
     end
 
@@ -181,8 +185,12 @@ module Xirr
     # Selects all negatives transactions from Cashflow
     def negatives
       return @negatives if @negatives
-      @negatives, @positives= self.partition { |x| x.amount > 0 }
+      extract_positives_and_negatives
       @negatives
+    end
+
+    def extract_positives_and_negatives
+      @positives, @negatives = self.partition { |x| x.amount < 0 }
     end
 
   end

@@ -48,7 +48,8 @@ module Xirr
       rate = [guess || cf.irr_guess]
       begin
         nlsolve(func, rate)
-        rate[0] < -1 ? nil : rate[0].round(Xirr::PRECISION)
+        rate[0] <= -1 ? nil : rate[0].round(Xirr::PRECISION)
+          # rate[0].round(Xirr::PRECISION)
       rescue
         nil
       end
