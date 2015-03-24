@@ -1,3 +1,6 @@
+## Version 0.5.2
+* Changed negative limits to return nil
+
 ## Version 0.5.1
 * Newton Method will return nil if result is less than 100%
 
