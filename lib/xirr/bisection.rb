@@ -15,38 +15,13 @@ module Xirr
       right = [BigDecimal.new(9.99999999, Xirr::PRECISION), cf.irr_guess + 1].max
       @original_right = right
       midpoint ||= cf.irr_guess
-      runs = 0
 
-      while (right - left).abs > Xirr::EPS && runs < options[:iteration_limit] do
-        runs += 1
-        left, midpoint, right, should_stop = bisection(left, midpoint, right)
-        break if should_stop
-        if right_limit_reached?(midpoint)
-          right           = right * 2
-          @original_right = @original_right * 2
-        end
-      end
+      midpoint, runs = loop_rates(left, midpoint, right, options[:iteration_limit])
 
-      #
-      # # Loops until difference is within error margin
-      # while (right - left).abs > Xirr::EPS && runs < Xirr::ITERATION_LIMIT do
-      #
-      #
-      # end
-
-      if runs >= options[:iteration_limit]
-        if options[:raise_exception]
-          raise ArgumentError, "Did not converge after #{runs} tries."
-        else
-          return nil
-        end
-      end
-
-      # return nil if right_limit_reached?(midpoint)
-
-      return midpoint.round Xirr::PRECISION
+      get_answer(midpoint, options, runs)
 
     end
+
 
     private
 
@@ -87,6 +62,33 @@ module Xirr
     def format_irr(left, right)
       irr = (right+left) / 2
     end
+
+    def get_answer(midpoint, options, runs)
+      if runs >= options[:iteration_limit]
+        if options[:raise_exception]
+          raise ArgumentError, "Did not converge after #{runs} tries."
+        else
+          nil
+        end
+      else
+        midpoint.round Xirr::PRECISION
+      end
+    end
+
+    def loop_rates(left, midpoint, right, iteration_limit)
+      runs = 0
+      while (right - left).abs > Xirr::EPS && runs < iteration_limit do
+        runs                               += 1
+        left, midpoint, right, should_stop = bisection(left, midpoint, right)
+        break if should_stop
+        if right_limit_reached?(midpoint)
+          right           = right * 2
+          @original_right = @original_right * 2
+        end
+      end
+      return midpoint, runs
+    end
+
 
   end
 
