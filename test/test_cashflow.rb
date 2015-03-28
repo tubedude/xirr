@@ -77,6 +77,11 @@ describe 'Cashflows' do
       @cf << Transaction.new(-800000, date: Date.today - 30)
     end
 
+    it 'bisection does not converge' do
+      assert_raises(ArgumentError) { @cf.xirr(guess: -0.15, method: :bisection, raise_exception: true, iteration_limit: 1) }
+    end
+
+
     it 'has an Internal Rate of Return on Bisection Method' do
       assert_equal '22.352207  '.to_f, @cf.xirr(method: :bisection)
     end
@@ -106,13 +111,7 @@ describe 'Cashflows' do
       @cf << Transaction.new(-6000, date: '1985-01-02'.to_date)
     end
 
-    it 'has an Internal Rate of Return on Bisection Method' do
-      skip 'Bisection should maybe return nil'
-      assert_equal '1.0597572345993451e+284'.to_f, @cf.xirr(method: :bisection)
-    end
-
-    it 'has an Internal Rate of Return on Bisection Method using a bad Guess' do
-      skip "Is returning nil, but no error"
+    it 'returns error if method is invalid' do
       assert_raises(ArgumentError) { @cf.xirr(guess: 0.15, method: :new, raise_exception: true) }
     end
 
@@ -304,6 +303,11 @@ describe 'Cashflows' do
     it 'respects a different period' do
       cf = Cashflow.new period: 100, flow: [Transaction.new(-1000, date: Date.new(1957, 1, 1)), Transaction.new(390000, date: Date.new(2013, 1, 1))]
       assert_equal 0.029598, cf.xirr
+    end
+
+    it 'respects default and ad hoc period' do
+      cf = Cashflow.new period: 100, flow: [Transaction.new(-1000, date: Date.new(1957, 1, 1)), Transaction.new(390000, date: Date.new(2013, 1, 1))]
+      assert_equal 0.112339, cf.xirr(period: 365.0)
     end
 
   end

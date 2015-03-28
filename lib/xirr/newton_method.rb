@@ -43,7 +43,7 @@ module Xirr
     # Calculates XIRR using Newton method
     # @return [BigDecimal]
     # @param guess [Float]
-    def xirr guess
+    def xirr guess, options
       func = Function.new(self, :xnpv)
       rate = [guess || cf.irr_guess]
       begin

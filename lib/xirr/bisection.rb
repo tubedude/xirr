@@ -8,7 +8,7 @@ module Xirr
     # @return [BigDecimal]
     # @param midpoint [Float]
     # An initial guess rate will override the {Cashflow#irr_guess}
-    def xirr midpoint
+    def xirr midpoint, options
 
       # Initial values
       left  = [BigDecimal.new(-0.99999999, Xirr::PRECISION), cf.irr_guess].min
@@ -17,7 +17,7 @@ module Xirr
       midpoint ||= cf.irr_guess
       runs = 0
 
-      while (right - left).abs > Xirr::EPS && runs < Xirr::ITERATION_LIMIT do
+      while (right - left).abs > Xirr::EPS && runs < options[:iteration_limit] do
         runs += 1
         left, midpoint, right, should_stop = bisection(left, midpoint, right)
         break if should_stop
@@ -34,8 +34,8 @@ module Xirr
       #
       # end
 
-      if runs >= Xirr::ITERATION_LIMIT
-        if cf.raise_exception
+      if runs >= options[:iteration_limit]
+        if options[:raise_exception]
           raise ArgumentError, "Did not converge after #{runs} tries."
         else
           return nil

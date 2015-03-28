@@ -1,3 +1,7 @@
+## Version 0.5.3
+* Better tests
+* added period option to Xirr
+
 ## Version 0.5.2
 * Changed negative limits to return nil
 
