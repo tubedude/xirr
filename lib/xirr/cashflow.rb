@@ -56,7 +56,7 @@ module Xirr
     # @param method [Symbol]
     # @return [Float]
     def xirr(guess: nil, method: nil, ** options)
-      method = process_options(method, options)
+      method, options = process_options(method, options)
       if invalid?
         raise ArgumentError, invalid_message if options[:raise_exception]
         BigDecimal.new(0, Xirr::PRECISION)
@@ -68,11 +68,10 @@ module Xirr
     end
 
     def process_options(method, options)
-      method                    = switch_fallback method
       @temporary_period         = options[:period]
       options[:raise_exception] ||= @options[:raise_exception] || Xirr::RAISE_EXCEPTION
       options[:iteration_limit] ||= @options[:iteration_limit] || Xirr::ITERATION_LIMIT
-      method
+      return switch_fallback(method), options
     end
 
     # If method is defined it will turn off fallback
