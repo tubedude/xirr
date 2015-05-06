@@ -62,7 +62,7 @@ module Xirr
         BigDecimal.new(0, Xirr::PRECISION)
       else
         xirr = choose_(method).send :xirr, guess, options
-        xirr = choose_(other_calculation_method(method)).send(:xirr, guess, options) if xirr.nil? && fallback
+        xirr = choose_(other_calculation_method(method)).send(:xirr, guess, options) if (xirr.nil? || xirr.nan?) && fallback
         xirr || Xirr::REPLACE_FOR_NIL
       end
     end
@@ -116,6 +116,12 @@ module Xirr
       @temporary_period || @period
     end
 
+    def << arg
+      super arg
+      self.sort! { |x, y| x.date <=> y.date }
+      self
+    end
+
     private
 
     # @param method [Symbol]
@@ -138,8 +144,8 @@ module Xirr
     # This implies the first transaction is a disbursement
     # @return [Integer]
     def first_transaction_direction
-      self.sort! { |x, y| x.date <=> y.date }
-      self.first.amount / self.first.amount.abs
+      # self.sort! { |x, y| x.date <=> y.date }
+      @first_transaction_direction ||= self.first.amount / self.first.amount.abs
     end
 
     # Based on the direction of the first investment finds the multiple cash-on-cash
@@ -148,8 +154,7 @@ module Xirr
     # @api private
     # @return [Float]
     def multiple
-      result = inflow.sum(&:amount) / -outflows.sum(&:amount)
-      first_transaction_positive? ? result : 1 / result
+      inflow.sum(&:amount).abs / outflows.sum(&:amount).abs
     end
 
     def first_transaction_positive?
@@ -168,7 +173,7 @@ module Xirr
     # @see #outflows
     # Selects all positives transactions from Cashflow
     def inflow
-      self.select { |x| x.amount < 0 }
+      self.select { |x| x.amount * first_transaction_direction < 0 }
     end
 
     # @api private
@@ -176,7 +181,7 @@ module Xirr
     # @see #inflow
     # Selects all negatives transactions from Cashflow
     def outflows
-      self.select { |x| x.amount > 0 }
+      self.select { |x| x.amount * first_transaction_direction > 0 }
     end
 
   end

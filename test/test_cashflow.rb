@@ -289,7 +289,15 @@ describe 'Cashflows' do
       cf << Transaction.new(500, date: '2014-10-19'.to_date)
       assert_equal '-0.996814607'.to_f.round(3), cf.xirr.to_f.round(3)
     end
+  end
+  describe 'marano' do
 
+    it 'it matchs Excel' do
+      cf = Cashflow.new
+      cf << Transaction.new(900.0, date: '2014-11-07'.to_date)
+      cf << Transaction.new(-13.5, date: '2015-05-06'.to_date)
+      assert_equal '-0.9998'.to_f.round(4), cf.xirr.to_f.round(4)
+    end
   end
 
   describe 'period' do
