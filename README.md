@@ -53,6 +53,17 @@ Or install it yourself as:
 
 http://rubydoc.info/github/tubedude/xirr/master/frames
 
+## Supported versions
+
+    Ruby:
+     - 2.2.1
+     - 2.3
+     - 2.4
+
+    ActiveSupport:
+     - 4.2
+     - 5
+
 ## Thanks
 
 http://puneinvestor.wordpress.com/2013/10/01/calculate-xirr-in-ruby-bisection-method/
