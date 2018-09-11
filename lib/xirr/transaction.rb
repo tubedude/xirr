@@ -1,5 +1,5 @@
+# frozen_string_literal: true
 module Xirr
-
   # A unit of the Cashflow.
   class Transaction
     attr_reader :amount, :date

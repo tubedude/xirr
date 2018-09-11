@@ -1,5 +1,5 @@
+# frozen_string_literal: true
 module Xirr
-
   # Methods that will be included in Cashflow to calculate XIRR
   class Bisection
     include Base
@@ -8,7 +8,7 @@ module Xirr
     # @return [BigDecimal]
     # @param midpoint [Float]
     # An initial guess rate will override the {Cashflow#irr_guess}
-    def xirr midpoint, options
+    def xirr(midpoint, options)
 
       # Initial values
       left  = [BigDecimal.new(-0.99999999, Xirr::PRECISION), cf.irr_guess].min
@@ -38,22 +38,16 @@ module Xirr
     # @return [Array]
     # Calculates the Bisections
     def bisection(left, midpoint, right)
-      _left, _mid = npv_positive?(left), npv_positive?(midpoint)
+      _left = xnpv(left).positive?
+      _mid = xnpv(midpoint).positive?
       if _left && _mid
-        return left, left, left, true if npv_positive?(right) # Not Enough Precision in the left to find the IRR
+        return left, left, left, true if xnpv(right).positive? # Not Enough Precision in the left to find the IRR
       end
       if _left == _mid
         return midpoint, format_irr(midpoint, right), right, false # Result is to the Right
       else
         return left, format_irr(left, midpoint), midpoint, false # Result is to the Left
       end
-    end
-
-    # @param midpoint [Float]
-    # @return [Bolean]
-    # Returns true if result is to the right ot the range
-    def npv_positive?(midpoint)
-      xnpv(midpoint) > 0
     end
 
     # @param left [Float]
@@ -78,19 +72,15 @@ module Xirr
     def loop_rates(left, midpoint, right, iteration_limit)
       runs = 0
       while (right - left).abs > Xirr::EPS && runs < iteration_limit do
-        runs                               += 1
+        runs += 1
         left, midpoint, right, should_stop = bisection(left, midpoint, right)
         break if should_stop
         if right_limit_reached?(midpoint)
-          right           = right * 2
-          @original_right = @original_right * 2
+          right           *= 2
+          @original_right *= 2
         end
       end
       return midpoint, runs
     end
-
-
   end
-
 end
-

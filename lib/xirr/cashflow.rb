@@ -1,5 +1,5 @@
+# frozen_string_literal: true
 module Xirr
-
   # Expands [Array] to store a set of transactions which will be used to calculate the XIRR
   # @note A Cashflow should consist of at least two transactions, one positive and one negative.
   class Cashflow < Array

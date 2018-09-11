@@ -1,5 +1,5 @@
+# frozen_string_literal: true
 module Xirr
-
   #  Base module for XIRR calculation Methods
   module Base
     extend ActiveSupport::Concern
@@ -24,7 +24,7 @@ module Xirr
     # @return [BigDecimal]
     def xnpv(rate)
       cf.inject(0) do |sum, t|
-        sum += xnpv_c rate, t.amount, periods_from_start(t.date)
+        sum + (xnpv_c rate, t.amount, periods_from_start(t.date))
       end
     end
 
@@ -35,6 +35,5 @@ module Xirr
           return amount / pow(1 + rate, period);
         }'
     }
-
   end
 end
