@@ -1,5 +1,5 @@
 # Xirr
-[![Build Status](https://travis-ci.org/tubedude/xirr.svg)](https://travis-ci.org/tubedude/xirr)[![Coverage Status](https://coveralls.io/repos/tubedude/xirr/badge.svg?branch=master)](https://coveralls.io/r/tubedude/xirr?branch=master)[![Code Climate](https://codeclimate.com/github/tubedude/xirr/badges/gpa.svg)](https://codeclimate.com/github/tubedude/xirr)[![Dependency Status](https://gemnasium.com/tubedude/xirr.svg)](https://gemnasium.com/tubedude/xirr)
+[![Build Status](https://travis-ci.org/tubedude/xirr.svg)](https://travis-ci.org/tubedude/xirr)[![Coverage Status](https://coveralls.io/repos/tubedude/xirr/badge.svg?branch=master)](https://coveralls.io/r/tubedude/xirr?branch=master)[![Code Climate](https://codeclimate.com/github/tubedude/xirr/badges/gpa.svg)](https://codeclimate.com/github/tubedude/xirr)[![Ebert](https://ebertapp.io/github/tubedude/xirr.svg)](https://ebertapp.io/github/tubedude/xirr)
 
 
 This is a gem to calculate XIRR on Bisection Method or Newton Method.
