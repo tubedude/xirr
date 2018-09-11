@@ -1,3 +1,6 @@
+## Version 0.7.0
+* Removing inline dependency
+
 ## Version 0.5.4
 * Fallsback If Newton Methods returns NaN 
 
