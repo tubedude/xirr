@@ -59,7 +59,7 @@ module Xirr
       method, options = process_options(method, options)
       if invalid?
         raise ArgumentError, invalid_message if options[:raise_exception]
-        BigDecimal.new(0, Xirr::PRECISION)
+        BigDecimal(0, Xirr::PRECISION)
       else
         xirr = choose_(method).send :xirr, guess, options
         xirr = choose_(other_calculation_method(method)).send(:xirr, guess, options) if (xirr.nil? || xirr.nan?) && fallback
