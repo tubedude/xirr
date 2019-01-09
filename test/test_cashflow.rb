@@ -136,7 +136,7 @@ describe 'Cashflows' do
     end
 
     it 'returns 0 instead of exception ' do
-      assert_equal BigDecimal.new(0, 6), @cf.xirr
+      assert_equal BigDecimal(0, 6), @cf.xirr
     end
 
 
