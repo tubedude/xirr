@@ -1,7 +1,8 @@
+# frozen_string_literal: true
+
 require_relative 'test_helper'
 
 describe 'Cashflows' do
-
   describe 'of an ok investment' do
     before(:all) do
       @cf = Cashflow.new
@@ -39,7 +40,6 @@ describe 'Cashflows' do
     end
   end
 
-
   describe 'of an inverted ok investment' do
     before(:all) do
       @cf = Cashflow.new
@@ -72,15 +72,14 @@ describe 'Cashflows' do
   describe 'of a very good investment' do
     before(:all) do
       @cf = Cashflow.new
-      @cf << Transaction.new(1000000, date: Date.today - 180)
-      @cf << Transaction.new(-2200000, date: Date.today - 60)
-      @cf << Transaction.new(-800000, date: Date.today - 30)
+      @cf << Transaction.new(1_000_000, date: Date.today - 180)
+      @cf << Transaction.new(-2_200_000, date: Date.today - 60)
+      @cf << Transaction.new(-800_000, date: Date.today - 30)
     end
 
     it 'bisection does not converge' do
       assert_raises(ArgumentError) { @cf.xirr(guess: -0.15, method: :bisection, raise_exception: true, iteration_limit: 1) }
     end
-
 
     it 'has an Internal Rate of Return on Bisection Method' do
       assert_equal '22.352207  '.to_f, @cf.xirr(method: :bisection)
@@ -139,7 +138,6 @@ describe 'Cashflows' do
       assert_equal BigDecimal.new(0, 6), @cf.xirr
     end
 
-
     it 'with a wrong method is invalid' do
       assert_raises(ArgumentError) { @cf.xirr raise_exception: true, method: :no_method }
     end
@@ -151,7 +149,6 @@ describe 'Cashflows' do
     it 'raises error when xirr is called' do
       assert true, !@cf.irr_guess
     end
-
   end
 
   describe 'an all-positive Cashflow' do
@@ -175,7 +172,6 @@ describe 'Cashflows' do
   end
 
   describe 'of a bad investment' do
-
     before(:all) do
       @cf = Cashflow.new
       @cf << Transaction.new(1000, date: '1985-01-01'.to_date)
@@ -194,12 +190,11 @@ describe 'Cashflows' do
     it 'has an educated guess' do
       assert_equal -0.022, @cf.irr_guess
     end
-
   end
 
   describe 'of a long investment' do
     before(:all) do
-      @cf = Cashflow.new flow: [Transaction.new(-1000, date: Date.new(1957, 1, 1)), Transaction.new(390000, date: Date.new(2013, 1, 1))]
+      @cf = Cashflow.new flow: [Transaction.new(-1000, date: Date.new(1957, 1, 1)), Transaction.new(390_000, date: Date.new(2013, 1, 1))]
     end
 
     it 'has an Internal Rate of Return on Bisection Method' do
@@ -213,7 +208,6 @@ describe 'Cashflows' do
     it 'has an educated guess' do
       assert_equal 0.112, @cf.irr_guess.round(6)
     end
-
   end
 
   describe 'reapeated cashflow' do
@@ -232,66 +226,62 @@ describe 'Cashflows' do
     it 'sums all transactions' do
       assert_equal -3000.0, @cf.compact_cf.map(&:amount).inject(&:+)
     end
-
   end
 
   describe 'of a real case' do
     before(:all) do
       @cf = Cashflow.new
-      @cf << Transaction.new(105187.06, date: '2011-12-07'.to_date)
-      @cf << Transaction.new(816709.66, date: '2011-12-07'.to_date)
-      @cf << Transaction.new(479069.684, date: '2011-12-07'.to_date)
-      @cf << Transaction.new(937309.708, date: '2012-01-18'.to_date)
-      @cf << Transaction.new(88622.661, date: '2012-07-03'.to_date)
-      @cf << Transaction.new(100000.0, date: '2012-07-03'.to_date)
-      @cf << Transaction.new(80000.0, date: '2012-07-19'.to_date)
-      @cf << Transaction.new(403627.95, date: '2012-07-23'.to_date)
-      @cf << Transaction.new(508117.9, date: '2012-07-23'.to_date)
-      @cf << Transaction.new(789706.87, date: '2012-07-23'.to_date)
-      @cf << Transaction.new(-88622.661, date: '2012-09-11'.to_date)
-      @cf << Transaction.new(-789706.871, date: '2012-09-11'.to_date)
-      @cf << Transaction.new(-688117.9, date: '2012-09-11'.to_date)
-      @cf << Transaction.new(-403627.95, date: '2012-09-11'.to_date)
-      @cf << Transaction.new(403627.95, date: '2012-09-12'.to_date)
-      @cf << Transaction.new(789706.871, date: '2012-09-12'.to_date)
-      @cf << Transaction.new(88622.661, date: '2012-09-12'.to_date)
-      @cf << Transaction.new(688117.9, date: '2012-09-12'.to_date)
-      @cf << Transaction.new(45129.14, date: '2013-03-11'.to_date)
-      @cf << Transaction.new(26472.08, date: '2013-03-11'.to_date)
-      @cf << Transaction.new(51793.2, date: '2013-03-11'.to_date)
-      @cf << Transaction.new(126605.59, date: '2013-03-11'.to_date)
-      @cf << Transaction.new(278532.29, date: '2013-03-28'.to_date)
-      @cf << Transaction.new(99284.1, date: '2013-03-28'.to_date)
-      @cf << Transaction.new(58238.57, date: '2013-03-28'.to_date)
-      @cf << Transaction.new(113945.03, date: '2013-03-28'.to_date)
-      @cf << Transaction.new(405137.88, date: '2013-05-21'.to_date)
-      @cf << Transaction.new(-405137.88, date: '2013-05-21'.to_date)
-      @cf << Transaction.new(165738.23, date: '2013-05-21'.to_date)
-      @cf << Transaction.new(-165738.23, date: '2013-05-21'.to_date)
-      @cf << Transaction.new(144413.24, date: '2013-05-21'.to_date)
-      @cf << Transaction.new(84710.65, date: '2013-05-21'.to_date)
-      @cf << Transaction.new(-84710.65, date: '2013-05-21'.to_date)
-      @cf << Transaction.new(-144413.24, date: '2013-05-21'.to_date)
-
+      @cf << Transaction.new(105_187.06, date: '2011-12-07'.to_date)
+      @cf << Transaction.new(816_709.66, date: '2011-12-07'.to_date)
+      @cf << Transaction.new(479_069.684, date: '2011-12-07'.to_date)
+      @cf << Transaction.new(937_309.708, date: '2012-01-18'.to_date)
+      @cf << Transaction.new(88_622.661, date: '2012-07-03'.to_date)
+      @cf << Transaction.new(100_000.0, date: '2012-07-03'.to_date)
+      @cf << Transaction.new(80_000.0, date: '2012-07-19'.to_date)
+      @cf << Transaction.new(403_627.95, date: '2012-07-23'.to_date)
+      @cf << Transaction.new(508_117.9, date: '2012-07-23'.to_date)
+      @cf << Transaction.new(789_706.87, date: '2012-07-23'.to_date)
+      @cf << Transaction.new(-88_622.661, date: '2012-09-11'.to_date)
+      @cf << Transaction.new(-789_706.871, date: '2012-09-11'.to_date)
+      @cf << Transaction.new(-688_117.9, date: '2012-09-11'.to_date)
+      @cf << Transaction.new(-403_627.95, date: '2012-09-11'.to_date)
+      @cf << Transaction.new(403_627.95, date: '2012-09-12'.to_date)
+      @cf << Transaction.new(789_706.871, date: '2012-09-12'.to_date)
+      @cf << Transaction.new(88_622.661, date: '2012-09-12'.to_date)
+      @cf << Transaction.new(688_117.9, date: '2012-09-12'.to_date)
+      @cf << Transaction.new(45_129.14, date: '2013-03-11'.to_date)
+      @cf << Transaction.new(26_472.08, date: '2013-03-11'.to_date)
+      @cf << Transaction.new(51_793.2, date: '2013-03-11'.to_date)
+      @cf << Transaction.new(126_605.59, date: '2013-03-11'.to_date)
+      @cf << Transaction.new(278_532.29, date: '2013-03-28'.to_date)
+      @cf << Transaction.new(99_284.1, date: '2013-03-28'.to_date)
+      @cf << Transaction.new(58_238.57, date: '2013-03-28'.to_date)
+      @cf << Transaction.new(113_945.03, date: '2013-03-28'.to_date)
+      @cf << Transaction.new(405_137.88, date: '2013-05-21'.to_date)
+      @cf << Transaction.new(-405_137.88, date: '2013-05-21'.to_date)
+      @cf << Transaction.new(165_738.23, date: '2013-05-21'.to_date)
+      @cf << Transaction.new(-165_738.23, date: '2013-05-21'.to_date)
+      @cf << Transaction.new(144_413.24, date: '2013-05-21'.to_date)
+      @cf << Transaction.new(84_710.65, date: '2013-05-21'.to_date)
+      @cf << Transaction.new(-84_710.65, date: '2013-05-21'.to_date)
+      @cf << Transaction.new(-144_413.24, date: '2013-05-21'.to_date)
     end
 
     it 'is a long and bad investment and newton generates an error' do
-      assert_equal '-1.0'.to_f, @cf.xirr #(method: :newton_method)
+      assert_equal '-1.0'.to_f, @cf.xirr # (method: :newton_method)
     end
-
   end
 
   describe 'xichen27' do
     it 'it matchs Excel' do
       cf = Cashflow.new
-      cf << Transaction.new(-10000, date: '2014-04-15'.to_date)
+      cf << Transaction.new(-10_000, date: '2014-04-15'.to_date)
       cf << Transaction.new(305.6, date: '2014-05-15'.to_date)
       cf << Transaction.new(500, date: '2014-10-19'.to_date)
       assert_equal '-0.996814607'.to_f.round(3), cf.xirr.to_f.round(3)
     end
   end
   describe 'marano' do
-
     it 'it matchs Excel' do
       cf = Cashflow.new
       cf << Transaction.new(900.0, date: '2014-11-07'.to_date)
@@ -301,23 +291,20 @@ describe 'Cashflows' do
   end
 
   describe 'period' do
-
     it 'has zero for years of investment' do
-      cf = Cashflow.new flow: [Transaction.new(105187.06, date: '2011-12-07'.to_date), Transaction.new(-105187.06 * 1.0697668105671994, date: '2011-12-07'.to_date)]
+      cf = Cashflow.new flow: [Transaction.new(105_187.06, date: '2011-12-07'.to_date), Transaction.new(-105_187.06 * 1.0697668105671994, date: '2011-12-07'.to_date)]
       assert_equal 0.0, cf.irr_guess
-      assert_equal Xirr::REPLACE_FOR_NIL, cf.xirr #(method: :newton_method)
+      assert_equal Xirr::REPLACE_FOR_NIL, cf.xirr # (method: :newton_method)
     end
 
     it 'respects a different period' do
-      cf = Cashflow.new period: 100, flow: [Transaction.new(-1000, date: Date.new(1957, 1, 1)), Transaction.new(390000, date: Date.new(2013, 1, 1))]
+      cf = Cashflow.new period: 100, flow: [Transaction.new(-1000, date: Date.new(1957, 1, 1)), Transaction.new(390_000, date: Date.new(2013, 1, 1))]
       assert_equal 0.029598, cf.xirr
     end
 
     it 'respects default and ad hoc period' do
-      cf = Cashflow.new period: 100, flow: [Transaction.new(-1000, date: Date.new(1957, 1, 1)), Transaction.new(390000, date: Date.new(2013, 1, 1))]
+      cf = Cashflow.new period: 100, flow: [Transaction.new(-1000, date: Date.new(1957, 1, 1)), Transaction.new(390_000, date: Date.new(2013, 1, 1))]
       assert_equal 0.112339, cf.xirr(period: 365.0)
     end
-
   end
-
 end
