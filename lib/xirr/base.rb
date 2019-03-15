@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Xirr
   #  Base module for XIRR calculation Methods
   module Base
@@ -28,12 +29,12 @@ module Xirr
       end
     end
 
-    inline { |builder|
+    inline do |builder|
       builder.include '<math.h>'
       builder.c '
         double xnpv_c(double rate, double amount, double period) {
           return amount / pow(1 + rate, period);
         }'
-    }
+    end
   end
 end
