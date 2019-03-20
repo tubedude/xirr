@@ -1,7 +1,6 @@
 require_relative 'test_helper'
 
 describe 'Cashflows' do
-
   describe 'of an ok investment' do
     before(:all) do
       @cf = Cashflow.new
@@ -38,7 +37,6 @@ describe 'Cashflows' do
       assert_equal '0.208'.to_f, @cf.irr_guess
     end
   end
-
 
   describe 'of an inverted ok investment' do
     before(:all) do
@@ -139,7 +137,6 @@ describe 'Cashflows' do
       assert_equal BigDecimal.new(0, 6), @cf.xirr
     end
 
-
     it 'with a wrong method is invalid' do
       assert_raises(ArgumentError) { @cf.xirr raise_exception: true, method: :no_method }
     end
@@ -151,7 +148,6 @@ describe 'Cashflows' do
     it 'raises error when xirr is called' do
       assert true, !@cf.irr_guess
     end
-
   end
 
   describe 'an all-positive Cashflow' do
@@ -194,7 +190,6 @@ describe 'Cashflows' do
     it 'has an educated guess' do
       assert_equal -0.022, @cf.irr_guess
     end
-
   end
 
   describe 'of a long investment' do
@@ -213,7 +208,6 @@ describe 'Cashflows' do
     it 'has an educated guess' do
       assert_equal 0.112, @cf.irr_guess.round(6)
     end
-
   end
 
   describe 'reapeated cashflow' do
@@ -232,7 +226,6 @@ describe 'Cashflows' do
     it 'sums all transactions' do
       assert_equal -3000.0, @cf.compact_cf.map(&:amount).inject(&:+)
     end
-
   end
 
   describe 'of a real case' do
@@ -278,7 +271,6 @@ describe 'Cashflows' do
     it 'is a long and bad investment and newton generates an error' do
       assert_equal '-1.0'.to_f, @cf.xirr #(method: :newton_method)
     end
-
   end
 
   describe 'xichen27' do
@@ -290,8 +282,8 @@ describe 'Cashflows' do
       assert_equal '-0.996814607'.to_f.round(3), cf.xirr.to_f.round(3)
     end
   end
-  describe 'marano' do
 
+  describe 'marano' do
     it 'it matchs Excel' do
       cf = Cashflow.new
       cf << Transaction.new(900.0, date: '2014-11-07'.to_date)
@@ -301,7 +293,6 @@ describe 'Cashflows' do
   end
 
   describe 'period' do
-
     it 'has zero for years of investment' do
       cf = Cashflow.new flow: [Transaction.new(105187.06, date: '2011-12-07'.to_date), Transaction.new(-105187.06 * 1.0697668105671994, date: '2011-12-07'.to_date)]
       assert_equal 0.0, cf.irr_guess
@@ -317,7 +308,5 @@ describe 'Cashflows' do
       cf = Cashflow.new period: 100, flow: [Transaction.new(-1000, date: Date.new(1957, 1, 1)), Transaction.new(390000, date: Date.new(2013, 1, 1))]
       assert_equal 0.112339, cf.xirr(period: 365.0)
     end
-
   end
-
 end
