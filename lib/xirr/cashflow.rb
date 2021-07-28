@@ -12,9 +12,9 @@ module Xirr
     #   cf << Transaction.new(-1234, date: '2013-03-31'.to_date)
     #   Or
     #   cf = Cashflow.new Transaction.new( 1000, date: '2013-01-01'.to_date), Transaction.new(-1234, date: '2013-03-31'.to_date)
-    def initialize(flow: [], period: Xirr::PERIOD, ** options)
+    def initialize(flow: [], period: Xirr.config.period, ** options)
       @period   = period
-      @fallback = options[:fallback] || Xirr::FALLBACK
+      @fallback = options[:fallback] || Xirr.config.fallback
       @options  = options
       self << flow
       self.flatten!
@@ -59,18 +59,18 @@ module Xirr
       method, options = process_options(method, options)
       if invalid?
         raise ArgumentError, invalid_message if options[:raise_exception]
-        BigDecimal(0, Xirr::PRECISION)
+        BigDecimal(0, Xirr.config.precision)
       else
         xirr = choose_(method).send :xirr, guess, options
         xirr = choose_(other_calculation_method(method)).send(:xirr, guess, options) if (xirr.nil? || xirr.nan?) && fallback
-        xirr || Xirr::REPLACE_FOR_NIL
+        xirr || Xirr.config.replace_for_nil
       end
     end
 
     def process_options(method, options)
       @temporary_period         = options[:period]
-      options[:raise_exception] ||= @options[:raise_exception] || Xirr::RAISE_EXCEPTION
-      options[:iteration_limit] ||= @options[:iteration_limit] || Xirr::ITERATION_LIMIT
+      options[:raise_exception] ||= @options[:raise_exception] || Xirr.config.raise_exception
+      options[:iteration_limit] ||= @options[:iteration_limit] || Xirr.config.iteration_limit
       return switch_fallback(method), options
     end
 
@@ -83,8 +83,8 @@ module Xirr
         @fallback = false
         method
       else
-        @fallback = Xirr::FALLBACK
-        Xirr::DEFAULT_METHOD
+        @fallback = Xirr.config.fallback
+        Xirr.config.default_method
       end
     end
 
