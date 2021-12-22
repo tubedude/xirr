@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 require 'bigdecimal/newton'
-include Newton
 
 module Xirr
   # Class to calculate IRR using Newton Method
   class NewtonMethod
     include Base
+    include Newton
 
     # Base class for working with Newton's Method.
     # @api private
