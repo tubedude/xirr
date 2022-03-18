@@ -21,7 +21,7 @@ Or install it yourself as:
 
 ```rb
 include Xirr
-    
+
 cf = Xirr::Cashflow.new
 cf << Xirr::Transaction.new(-1000,  date: '2014-01-01'.to_date)
 cf << Xirr::Transaction.new(-2000,  date: '2014-03-01'.to_date)
@@ -41,7 +41,7 @@ cf.xirr
 ## Configuration
 
     # intializer/xirr.rb
-    
+
     Xirr.configure do |config|
       config.eps = '1.0e-12'
       config.days_in_year = 365.25
@@ -55,13 +55,10 @@ http://rubydoc.info/github/tubedude/xirr/master/frames
 ## Supported versions
 
     Ruby:
-     - 2.2.1
-     - 2.3
-     - 2.4
+     - 2.7
 
     ActiveSupport:
-     - 4.2
-     - 5
+     - 7
 
 ## Thanks
 
