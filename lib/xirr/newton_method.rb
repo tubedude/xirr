@@ -12,17 +12,17 @@ module Xirr
     # @api private
     class Function
       values = {
-        eps: Xirr::EPS,
-        one:  '1.0',
-        two:  '2.0',
-        ten:  '10.0',
-        zero: '0.0'
+          eps: Xirr.config.eps,
+          one:  '1.0',
+          two:  '2.0',
+          ten:  '10.0',
+          zero: '0.0'
       }
 
       # define default values
       values.each do |key, value|
         define_method key do
-          BigDecimal(value, Xirr::PRECISION)
+          BigDecimal(value, Xirr.config.precision)
         end
       end
 
@@ -37,8 +37,8 @@ module Xirr
       # Necessary for #nlsolve
       # @param x [BigDecimal]
       def values(x)
-        value = @transactions.send(@function, BigDecimal(x[0].to_s, Xirr::PRECISION))
-        [BigDecimal(value.to_s, Xirr::PRECISION)]
+        value = @transactions.send(@function, BigDecimal(x[0].to_s, Xirr.config.precision))
+        [BigDecimal(value.to_s, Xirr.config.precision)]
       end
     end
 
@@ -50,10 +50,10 @@ module Xirr
       rate = [guess || cf.irr_guess]
       begin
         nlsolve(func, rate)
-        (rate[0] <= -1 || rate[0].nan?) ? nil : rate[0].round(Xirr::PRECISION)
+        (rate[0] <= -1 || rate[0].nan?) ? nil : rate[0].round(Xirr.config.precision)
 
-        # rate[0].round(Xirr::PRECISION)
-      rescue StandardError
+          # rate[0].round(Xirr.config.precision)
+      rescue
         nil
       end
     end
