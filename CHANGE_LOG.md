@@ -1,3 +1,7 @@
+## Version 0.7.0
+* Remove possibility to return false from `irr_guess`
+* Bumped dependencies
+
 ## Version 0.5.4
 * Fallsback If Newton Methods returns NaN 
 

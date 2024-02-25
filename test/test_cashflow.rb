@@ -265,7 +265,6 @@ describe 'Cashflows' do
       @cf << Transaction.new(84710.65, date: '2013-05-21'.to_date)
       @cf << Transaction.new(-84710.65, date: '2013-05-21'.to_date)
       @cf << Transaction.new(-144413.24, date: '2013-05-21'.to_date)
-
     end
 
     it 'is a long and bad investment and newton generates an error' do
