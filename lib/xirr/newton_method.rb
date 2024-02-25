@@ -12,11 +12,11 @@ module Xirr
     # @api private
     class Function
       values = {
-          eps: Xirr::EPS,
-          one:  '1.0',
-          two:  '2.0',
-          ten:  '10.0',
-          zero: '0.0'
+        eps: Xirr::EPS,
+        one:  '1.0',
+        two:  '2.0',
+        ten:  '10.0',
+        zero: '0.0'
       }
 
       # define default values
@@ -45,15 +45,15 @@ module Xirr
     # Calculates XIRR using Newton method
     # @return [BigDecimal]
     # @param guess [Float]
-    def xirr guess, options
+    def xirr(guess, _options)
       func = Function.new(self, :xnpv)
       rate = [guess || cf.irr_guess]
       begin
         nlsolve(func, rate)
         (rate[0] <= -1 || rate[0].nan?) ? nil : rate[0].round(Xirr::PRECISION)
 
-          # rate[0].round(Xirr::PRECISION)
-      rescue
+        # rate[0].round(Xirr::PRECISION)
+      rescue StandardError
         nil
       end
     end

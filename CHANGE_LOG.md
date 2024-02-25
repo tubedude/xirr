@@ -1,5 +1,7 @@
 ## Version 0.7.0
-* Remove possibility to return false from `irr_guess`
+* Removed `RubyInLine`
+* Removed possibility to return false from `irr_guess`
+* Removed global newton module
 * Bumped dependencies
 
 ## Version 0.5.4

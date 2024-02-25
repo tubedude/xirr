@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Xirr
   # Expands [Array] to store a set of transactions which will be used to calculate the XIRR
   # @note A Cashflow should consist of at least two transactions, one positive and one negative.
@@ -17,7 +18,7 @@ module Xirr
       @fallback = options[:fallback] || Xirr::FALLBACK
       @options  = options
       self << flow
-      self.flatten!
+      flatten!
     end
 
     # Check if Cashflow is invalid
@@ -35,21 +36,21 @@ module Xirr
     # @return [Float]
     # Sums all amounts in a cashflow
     def sum
-      self.map(&:amount).sum
+      map(&:amount).sum
     end
 
     # Last investment date
     # @return [Time]
     def max_date
-      @max_date ||= self.map(&:date).max
+      @max_date ||= map(&:date).max
     end
 
     # Calculates a simple IRR guess based on period of investment and multiples.
     # @return [Float]
     def irr_guess
       return @irr_guess = 0.0 if periods_of_investment.zero?
-      @irr_guess = valid? ? ((multiple ** (1 / periods_of_investment)) - 1).round(3) : 0.0
-      @irr_guess == 1.0/0 ? 0.0 : @irr_guess
+      @irr_guess = valid? ? ((multiple**(1 / periods_of_investment)) - 1).round(3) : 0.0
+      @irr_guess == 1.0 / 0 ? 0.0 : @irr_guess
     end
 
     # @param guess [Float]
@@ -68,17 +69,17 @@ module Xirr
     end
 
     def process_options(method, options)
-      @temporary_period         = options[:period]
+      @temporary_period= options[:period]
       options[:raise_exception] ||= @options[:raise_exception] || Xirr::RAISE_EXCEPTION
       options[:iteration_limit] ||= @options[:iteration_limit] || Xirr::ITERATION_LIMIT
-      return switch_fallback(method), options
+      [switch_fallback(method), options]
     end
 
     # If method is defined it will turn off fallback
     # it return either the provided method or the system default
     # @param method [Symbol]
     # @return [Symbol]
-    def switch_fallback method
+    def switch_fallback(method)
       if method
         @fallback = false
         method
@@ -95,14 +96,14 @@ module Xirr
     def compact_cf
       # self
       compact = Hash.new 0
-      self.each { |flow| compact[flow.date] += flow.amount }
+      each { |flow| compact[flow.date] += flow.amount }
       Cashflow.new flow: compact.map { |key, value| Transaction.new(value, date: key) }, options: options, period: period
     end
 
     # First investment date
     # @return [Time]
     def min_date
-      @min_date ||= self.map(&:date).min
+      @min_date ||= map(&:date).min
     end
 
     # @return [String]
@@ -116,9 +117,9 @@ module Xirr
       @temporary_period || @period
     end
 
-    def << arg
+    def <<(arg)
       super arg
-      self.sort! { |x, y| x.date <=> y.date }
+      sort! { |x, y| x.date <=> y.date }
       self
     end
 
@@ -129,12 +130,12 @@ module Xirr
     # @return [Class]
     def choose_(method)
       case method
-        when :bisection
-          Bisection.new compact_cf
-        when :newton_method
-          NewtonMethod.new compact_cf
-        else
-          raise ArgumentError, "There is no method called #{method} "
+      when :bisection
+        Bisection.new compact_cf
+      when :newton_method
+        NewtonMethod.new compact_cf
+      else
+        raise ArgumentError, "There is no method called #{method} "
       end
     end
 
@@ -145,7 +146,7 @@ module Xirr
     # @return [Integer]
     def first_transaction_direction
       # self.sort! { |x, y| x.date <=> y.date }
-      @first_transaction_direction ||= self.first.amount / self.first.amount.abs
+      @first_transaction_direction ||= first.amount / first.amount.abs
     end
 
     # Based on the direction of the first investment finds the multiple cash-on-cash
@@ -173,7 +174,7 @@ module Xirr
     # @see #outflows
     # Selects all positives transactions from Cashflow
     def inflow
-      self.select { |x| x.amount * first_transaction_direction < 0 }
+      select { |x| x.amount * first_transaction_direction < 0 }
     end
 
     # @api private
@@ -181,9 +182,7 @@ module Xirr
     # @see #inflow
     # Selects all negatives transactions from Cashflow
     def outflows
-      self.select { |x| x.amount * first_transaction_direction > 0 }
+      select { |x| x.amount * first_transaction_direction > 0 }
     end
-
   end
-
 end

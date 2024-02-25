@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Xirr
   # A unit of the Cashflow.
   class Transaction
@@ -9,7 +10,7 @@ module Xirr
     # @param amount [Numeric]
     # @param opts [Hash]
     # @note Don't forget to add date: [Date] in the opts hash.
-    def initialize(amount, opts={})
+    def initialize(amount, opts = {})
       self.amount = amount
 
       # Set optional attributes..
@@ -22,7 +23,7 @@ module Xirr
     # @param value [Date, Time]
     # @return [Date]
     def date=(value)
-      @date = value.kind_of?(Time) ? value.to_date : value
+      @date = value.is_a?(Time) ? value.to_date : value
     end
 
     # Sets the amount
@@ -36,7 +37,5 @@ module Xirr
     def inspect
       "T(#{@amount},#{@date})"
     end
-
   end
-
 end
