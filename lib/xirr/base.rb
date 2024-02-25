@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Xirr
   #  Base module for XIRR calculation Methods
   module Base
@@ -24,16 +25,9 @@ module Xirr
     # @return [BigDecimal]
     def xnpv(rate)
       cf.inject(0) do |sum, t|
-        sum + (xnpv_c rate, t.amount, periods_from_start(t.date))
+        # sum + (xnpv_c rate, t.amount, periods_from_start(t.date))
+        sum + t.amount / (1+rate.to_f) ** periods_from_start(t.date)
       end
-    end
-
-    inline do |builder|
-      builder.include '<math.h>'
-      builder.c '
-        double xnpv_c(double rate, double amount, double period) {
-          return amount / pow(1 + rate, period);
-        }'
     end
   end
 end
