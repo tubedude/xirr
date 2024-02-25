@@ -11,8 +11,8 @@ module Xirr
     def xirr(midpoint, options)
 
       # Initial values
-      left  = [BigDecimal(-0.99999999, Xirr::PRECISION), cf.irr_guess].min
-      right = [BigDecimal(9.99999999, Xirr::PRECISION), cf.irr_guess + 1].max
+      left  = [BigDecimal(-0.99999999, Xirr.config.precision), cf.irr_guess].min
+      right = [BigDecimal(9.99999999, Xirr.config.precision), cf.irr_guess + 1].max
       @original_right = right
       midpoint ||= cf.irr_guess
 
@@ -29,7 +29,7 @@ module Xirr
     # @return [Boolean]
     # Checks if result is the right limit.
     def right_limit_reached?(midpoint)
-      (@original_right - midpoint).abs < Xirr::EPS
+      (@original_right - midpoint).abs < Xirr.config.eps
     end
 
     # @param left [BigDecimal]
@@ -65,13 +65,13 @@ module Xirr
           nil
         end
       else
-        midpoint.round Xirr::PRECISION
+        midpoint.round Xirr.config.precision
       end
     end
 
     def loop_rates(left, midpoint, right, iteration_limit)
       runs = 0
-      while (right - left).abs > Xirr::EPS && runs < iteration_limit do
+      while (right - left).abs > Xirr.config.eps && runs < iteration_limit do
         runs += 1
         left, midpoint, right, should_stop = bisection(left, midpoint, right)
         break if should_stop

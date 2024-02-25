@@ -309,4 +309,39 @@ describe 'Cashflows' do
       assert_equal 0.112339, cf.xirr(period: 365.0)
     end
   end
+
+  describe 'with changing precision values' do
+    before(:all) do
+      # {"2021-05-17"=>-3005.69, "2021-06-03"=>-4781.38, "2021-06-17"=>3.09, "2021-06-21"=>8509.93}
+      @cf = Cashflow.new
+      @cf << Transaction.new(-117.38, date: '2021-03-17'.to_date)
+      @cf << Transaction.new(-2370.02, date: '2021-03-23'.to_date)
+      @cf << Transaction.new(0.29, date: '2021-03-26'.to_date)
+      @cf << Transaction.new(0.32, date: '2021-04-01'.to_date)
+      @cf << Transaction.new(-3005.69, date: '2021-05-17'.to_date)
+      @cf << Transaction.new(-4781.38, date: '2021-06-03'.to_date)
+      @cf << Transaction.new(3.09, date: '2021-06-17'.to_date)
+      @cf << Transaction.new(8509.93, date: '2021-06-21'.to_date)
+    end
+
+    it 'gives nil value for xirr' do
+      assert_equal 0.0, @cf.xirr
+    end
+
+    it 'gives correct value with configuration' do
+      Xirr.configure do |config|
+        config.precision = 10
+        config.eps = '1.0e-8'.to_f
+      end
+      assert_equal  -0.8317173694e0, @cf.xirr
+    end
+
+    # resetting configuration
+    after(:all) do
+      Xirr.configure do |config|
+        config.precision = 6
+        config.eps = '1.0e-6'.to_f
+      end
+    end
+  end
 end
