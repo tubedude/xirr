@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Xirr
   # Methods that will be included in Cashflow to calculate XIRR
   class Bisection
@@ -9,7 +10,6 @@ module Xirr
     # @param midpoint [Float]
     # An initial guess rate will override the {Cashflow#irr_guess}
     def xirr(midpoint, options)
-
       # Initial values
       left  = [BigDecimal(-0.99999999, Xirr.config.precision), cf.irr_guess].min
       right = [BigDecimal(9.99999999, Xirr.config.precision), cf.irr_guess + 1].max
@@ -19,9 +19,7 @@ module Xirr
       midpoint, runs = loop_rates(left, midpoint, right, options[:iteration_limit])
 
       get_answer(midpoint, options, runs)
-
     end
-
 
     private
 
@@ -54,15 +52,13 @@ module Xirr
     # @param right [Float]
     # @return [Float] IRR of the Cashflow
     def format_irr(left, right)
-      irr = (right+left) / 2
+      irr = (right + left) / 2
     end
 
     def get_answer(midpoint, options, runs)
       if runs >= options[:iteration_limit]
         if options[:raise_exception]
           raise ArgumentError, "Did not converge after #{runs} tries."
-        else
-          nil
         end
       else
         midpoint.round Xirr.config.precision
@@ -80,7 +76,7 @@ module Xirr
           @original_right *= 2
         end
       end
-      return midpoint, runs
+      [midpoint, runs]
     end
   end
 end

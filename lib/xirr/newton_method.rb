@@ -1,11 +1,12 @@
 # frozen_string_literal: true
 require 'bigdecimal/newton'
-include Newton
 
 module Xirr
   # Class to calculate IRR using Newton Method
   class NewtonMethod
     include Base
+    include Newton
+
 
     # Base class for working with Newton's Method.
     # @api private
@@ -44,7 +45,7 @@ module Xirr
     # Calculates XIRR using Newton method
     # @return [BigDecimal]
     # @param guess [Float]
-    def xirr guess, options
+    def xirr(guess, _options)
       func = Function.new(self, :xnpv)
       rate = [guess || cf.irr_guess]
       begin
