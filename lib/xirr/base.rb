@@ -4,7 +4,6 @@ module Xirr
   #  Base module for XIRR calculation Methods
   module Base
     extend ActiveSupport::Concern
-    require 'inline'
     attr_reader :cf
 
     # @param cf [Cashflow]

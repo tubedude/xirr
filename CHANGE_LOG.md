@@ -1,3 +1,5 @@
+## Unreleased
+* Fix removal of `RubyInLine`
 ## Version 0.7.0
 * Removed `RubyInLine`
 * Removed possibility to return false from `irr_guess`
