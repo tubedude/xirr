@@ -1,5 +1,9 @@
 ## Unreleased
 * Fix removal of `RubyInLine`
+* Allow activesupport 7. Fixes #30
+* Breaking: Require activesupport >= 6.1
+* Breaking: Require ruby >= 3.1
+
 ## Version 0.7.0
 * Removed `RubyInLine`
 * Removed possibility to return false from `irr_guess`
