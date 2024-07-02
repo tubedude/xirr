@@ -1,4 +1,5 @@
 ## Unreleased
+* Fix removal of `RubyInLine`
 * Allow activesupport 7. Fixes #30
 * Breaking: Require activesupport >= 6.1
 * Breaking: Require ruby >= 3.1
