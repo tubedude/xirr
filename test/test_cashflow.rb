@@ -84,7 +84,7 @@ describe 'Cashflows' do
       assert_equal '22.352207  '.to_f, @cf.xirr(method: :bisection)
     end
 
-    it 'It won\'t fall back if method provided' do
+    it 'it won\'t fall back if method provided' do
       @cf.xirr method: :bisection
       assert_equal false, @cf.fallback
     end
@@ -344,4 +344,71 @@ describe 'Cashflows' do
       end
     end
   end
+
+  describe 'irr_guess' do
+    it 'Basic Scenario with Simple Positive Cash Flows' do
+      @cf = Cashflow.new
+      @cf << Transaction.new(1000, date: '2000-01-01'.to_date)
+      @cf << Transaction.new(-1200, date: '2001-01-01'.to_date)
+      assert_equal '0.2'.to_f, @cf.irr_guess
+    end
+    
+    it 'Zero Periods of Investment' do
+      @cf = Cashflow.new
+      @cf << Transaction.new(1000, date: '2000-01-01'.to_date)
+      @cf << Transaction.new(-1000, date: '2000-01-01'.to_date)
+      assert_equal '0.0'.to_f, @cf.irr_guess
+    end
+    
+    it 'Negative Multiple' do
+      @cf = Cashflow.new
+      @cf << Transaction.new(1000, date: '2000-01-01'.to_date)
+      @cf << Transaction.new(-2000, date: '2000-01-01'.to_date)
+      assert_equal '0.0'.to_f, @cf.irr_guess
+    end
+    
+    it 'No Cash Flows' do
+      @cf = Cashflow.new
+      assert_equal '0.0'.to_f, @cf.irr_guess
+    end
+    
+    it 'Multiple Positive Cash Flows and Large Investment Period' do
+      @cf = Cashflow.new
+      @cf << Transaction.new(1000, date: '2000-01-01'.to_date)
+      @cf << Transaction.new(-100, date: '2010-01-01'.to_date)
+      @cf << Transaction.new(-100, date: '2020-01-01'.to_date)
+      assert_equal '0.072'.to_f, @cf.irr_guess
+    end
+    
+    it 'Very Small Periods of Investment' do
+      @cf = Cashflow.new
+      @cf << Transaction.new(1000, date: '2000-01-01'.to_date)
+      @cf << Transaction.new(-500, date: '2000-01-02'.to_date)
+      assert_equal '0.0'.to_f, @cf.irr_guess
+    end
+    
+    it 'Complex Cash Flows' do
+      @cf = Cashflow.new
+      @cf << Transaction.new(1000, date: '2000-01-01'.to_date)
+      @cf << Transaction.new(-500, date: '2001-01-01'.to_date)
+      @cf << Transaction.new(-300, date: '2002-01-01'.to_date)
+      @cf << Transaction.new(-200, date: '2003-01-01'.to_date)
+      assert_equal '0.195'.to_f, @cf.irr_guess
+    end
+    
+    it 'Only Negative Cash Flows' do
+      @cf = Cashflow.new
+      @cf << Transaction.new(-1000, date: '2000-01-01'.to_date)
+      @cf << Transaction.new(-500, date: '2001-01-01'.to_date)
+      assert_equal '0.0'.to_f, @cf.irr_guess
+    end
+    
+    it 'Positive and Negative Cash Flows Spread Over Different Periods' do
+      @cf = Cashflow.new
+      @cf << Transaction.new(500, date: '2000-01-01'.to_date)
+      @cf << Transaction.new(-100, date: '2005-01-01'.to_date)
+      @cf << Transaction.new(-400, date: '2010-01-01'.to_date)
+      assert_equal '0.033'.to_f, @cf.irr_guess
+    end
+  end 
 end

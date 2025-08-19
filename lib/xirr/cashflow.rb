@@ -49,8 +49,10 @@ module Xirr
     # @return [Float]
     def irr_guess
       return @irr_guess = 0.0 if periods_of_investment.zero?
-      @irr_guess = valid? ? ((multiple**(1 / periods_of_investment)) - 1).round(3) : 0.0
-      @irr_guess == 1.0 / 0 ? 0.0 : @irr_guess
+      return @irr_guess = 0.0 if multiple <= 0
+    
+      @irr_guess = valid? ? ((multiple**(1.0 / periods_of_investment)) - 1).round(3) : 0.0
+      @irr_guess.infinite? ? 0.0 : @irr_guess
     end
 
     # @param guess [Float]
