@@ -6,17 +6,12 @@ module Xirr
     attr_reader :amount, :date
 
     # @example
-    #   Transaction.new -1000, date: Date.now
+    #   Transaction.new(-1000, date: Date.new(2013, 1, 1))
     # @param amount [Numeric]
-    # @param opts [Hash]
-    # @note Don't forget to add date: [Date] in the opts hash.
+    # @param opts [Hash] must include +:date+, the date the amount falls on
     def initialize(amount, opts = {})
       self.amount = amount
-
-      # Set optional attributes..
-      opts.each do |key, value|
-        send("#{key}=", value)
-      end
+      opts.each { |key, value| send("#{key}=", value) }
     end
 
     # Sets the date
@@ -30,7 +25,7 @@ module Xirr
     # @param value [Numeric]
     # @return [Float]
     def amount=(value)
-      @amount = value.to_f || 0.0
+      @amount = value.to_f
     end
 
     # @return [String]

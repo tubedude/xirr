@@ -6,10 +6,10 @@ describe 'Transaction' do
   end
 
   it 'converts amount to float' do
-    assert true, @t.amount.kind_of?(Float)
+    assert_kind_of Float, @t.amount
   end
 
-  it 'retreives the date' do
+  it 'retrieves the date' do
     assert_equal Date.today, @t.date
   end
 

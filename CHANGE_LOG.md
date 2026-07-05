@@ -1,8 +1,37 @@
-## Unreleased
-* Fix removal of `RubyInLine`
-* Allow activesupport 7. Fixes #30
-* Breaking: Require activesupport >= 6.1
-* Breaking: Require ruby >= 3.1
+## Version 1.0.0
+* New default solver: a safeguarded Newton (`rtsafe`) that brackets the root and
+  falls back to a bisection step per iteration. It converges on flows the old
+  Newton/bisection pair failed on — long maturities, low rates, and returns near
+  -100% — without overflowing.
+* `Cashflow#xirr` no longer silently returns `0.0` for a flow that does have a
+  rate; the more robust solver now finds it. `Cashflow#xirr!` raises on an
+  invalid flow or genuine non-convergence instead of returning
+  `config.replace_for_nil`.
+* Added `Cashflow#xnpv(rate)` and `Cashflow#mirr(finance_rate, reinvest_rate)`.
+* Added periodic (dateless) helpers `Xirr.irr`, `Xirr.npv`, `Xirr.mirr` for
+  amounts at equally spaced periods.
+* Added the wider finance toolkit ported from the finance-elixir library:
+  `Xirr::TVM` (`fv`, `pv`, `pmt`, `ipmt`, `ppmt`, `nper`, `rate`,
+  `amortization_schedule`), `Xirr::Rates` (`effective_annual_rate`,
+  `nominal_rate`, `continuous_to_periodic`), `Xirr::Bonds` (`price`, `ytm`,
+  `duration`, `modified_duration`, `convexity`), `Xirr::Depreciation` (`sln`,
+  `syd`, `ddb`, `db`), and `Xirr::Returns` (`volatility`, `cagr`,
+  `payback_period`, `discounted_payback_period`, `profitability_index`, `twr`).
+* Added an optional native (C) build of the rtsafe solver, selectable with
+  `xirr(method: :rtsafe_c)`. It is best-effort: without a compiler the gem falls
+  back to pure Ruby, and `Xirr::NATIVE` reports whether it loaded. Added a
+  `benchmark/solvers.rb` comparing the solvers.
+* Added a `:brent` solver (`xirr(method: :brent)`): derivative-free Brent's
+  method over rtsafe's bracketing — as robust as rtsafe, and cheaper per
+  iteration, which can help on very large cashflows.
+* The `:bisection` and `:newton_method` methods are still available via
+  `xirr(method:)`. `:newton_method` was reimplemented in plain Ruby, dropping the
+  deprecated `bigdecimal/newton` standard library.
+* Dropped the `bigdecimal` dependency entirely — results are `Float`, rounded to
+  `config.precision`. (The solvers already computed in `Float`.)
+* Removed the defunct Travis and Coveralls setup; added GitHub Actions CI.
+* Allow activesupport 7 (Fixes #30). Breaking: require activesupport >= 6.1 and
+  ruby >= 3.1.
 
 ## Version 0.7.0
 * Removed `RubyInLine`
