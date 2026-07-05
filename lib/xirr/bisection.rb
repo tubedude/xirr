@@ -1,18 +1,20 @@
 # frozen_string_literal: true
 
 module Xirr
-  # Methods that will be included in Cashflow to calculate XIRR
+  # Bisection solver: repeatedly halves a bracket that straddles the root. It
+  # always converges on a bracketed flow but only linearly, so it is slower than
+  # {RtSafe}, which is the default. Kept for `xirr(method: :bisection)`.
   class Bisection
     include Base
 
     # Calculates yearly Internal Rate of Return
-    # @return [BigDecimal]
+    # @return [Float]
     # @param midpoint [Float]
     # An initial guess rate will override the {Cashflow#irr_guess}
     def xirr(midpoint, options)
       # Initial values
-      left  = [BigDecimal(-0.99999999, Xirr.config.precision), cf.irr_guess].min
-      right = [BigDecimal(9.99999999, Xirr.config.precision), cf.irr_guess + 1].max
+      left  = [-0.99999999, cf.irr_guess].min
+      right = [9.99999999, cf.irr_guess + 1].max
       @original_right = right
       midpoint ||= cf.irr_guess
 
@@ -23,16 +25,16 @@ module Xirr
 
     private
 
-    # @param midpoint [BigDecimal]
+    # @param midpoint [Float]
     # @return [Boolean]
     # Checks if result is the right limit.
     def right_limit_reached?(midpoint)
       (@original_right - midpoint).abs < Xirr.config.eps
     end
 
-    # @param left [BigDecimal]
-    # @param midpoint [BigDecimal]
-    # @param right [BigDecimal]
+    # @param left [Float]
+    # @param midpoint [Float]
+    # @param right [Float]
     # @return [Array]
     # Calculates the Bisections
     def bisection(left, midpoint, right)
@@ -57,11 +59,13 @@ module Xirr
 
     def get_answer(midpoint, options, runs)
       if runs >= options[:iteration_limit]
-        if options[:raise_exception]
-          raise ArgumentError, "Did not converge after #{runs} tries."
-        end
+        raise ArgumentError, "Did not converge after #{runs} tries." if options[:raise_exception]
+
+        nil
       else
-        midpoint.round Xirr.config.precision
+        answer = midpoint.round(Xirr.config.precision)
+        # A midpoint parked at the -100% floor means no root was bracketed.
+        answer <= -1 ? nil : answer
       end
     end
 

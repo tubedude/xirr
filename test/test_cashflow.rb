@@ -130,11 +130,11 @@ describe 'Cashflows' do
     end
 
     it 'is invalid' do
-      assert true, !@cf.valid?
+      refute @cf.valid?
     end
 
     it 'returns 0 instead of exception ' do
-      assert_equal BigDecimal(0, 6), @cf.xirr
+      assert_equal 0.0, @cf.xirr
     end
 
     it 'with a wrong method is invalid' do
@@ -145,8 +145,8 @@ describe 'Cashflows' do
       assert_raises(ArgumentError) { @cf.xirr raise_exception: true }
     end
 
-    it 'raises error when xirr is called' do
-      assert true, !@cf.irr_guess
+    it 'has a zero irr_guess' do
+      assert_equal 0.0, @cf.irr_guess
     end
   end
 
@@ -158,15 +158,15 @@ describe 'Cashflows' do
     end
 
     it 'is invalid' do
-      assert true, !@cf.valid?
+      refute @cf.valid?
     end
 
     it 'raises error when #xirr is called' do
       assert_raises(ArgumentError) { @cf.xirr raise_exception: true }
     end
 
-    it 'is invalid when #irr_guess is called' do
-      assert true, !@cf.irr_guess
+    it 'has a zero irr_guess' do
+      assert_equal 0.0, @cf.irr_guess
     end
   end
 
@@ -184,7 +184,8 @@ describe 'Cashflows' do
     end
 
     it 'has an Internal Rate of Return on Newton Method' do
-      assert true, @cf.xirr(method: :newton_method).nan?
+      # The pure-Ruby Newton now finds this root instead of failing on it.
+      assert_equal '-0.034592'.to_f, @cf.xirr(method: :newton_method)
     end
 
     it 'has an educated guess' do
@@ -210,7 +211,7 @@ describe 'Cashflows' do
     end
   end
 
-  describe 'reapeated cashflow' do
+  describe 'repeated cashflow' do
     before(:all) do
       @cf = Cashflow.new
       @cf << Transaction.new(1000.0, date: '2011-12-07'.to_date)
@@ -218,10 +219,10 @@ describe 'Cashflows' do
       @cf << Transaction.new(-2000.0, date: '2013-05-21'.to_date)
       @cf << Transaction.new(-4000.0, date: '2013-05-21'.to_date)
     end
-    #
-    # it 'has a compact cashflow' do
-    #   assert_equal 2, @cf.compact_cf.count
-    # end
+
+    it 'has a compact cashflow' do
+      assert_equal 2, @cf.compact_cf.count
+    end
 
     it 'sums all transactions' do
       assert_equal -3000.0, @cf.compact_cf.map(&:amount).inject(&:+)
@@ -267,9 +268,10 @@ describe 'Cashflows' do
       @cf << Transaction.new(-144413.24, date: '2013-05-21'.to_date)
     end
 
-    it 'is a long and bad investment and newton generates an error' do
-      skip 'Test is weirdly taking too long'
-      assert_equal '-1.0'.to_f, @cf.xirr #(method: :newton_method)
+    it 'returns replace_for_nil for a net-positive flow with no rate' do
+      # The old solver hung or raised here; rtsafe finds no sign change and
+      # returns cleanly.
+      assert_equal Xirr::REPLACE_FOR_NIL, @cf.xirr
     end
   end
 
@@ -324,8 +326,10 @@ describe 'Cashflows' do
       @cf << Transaction.new(8509.93, date: '2021-06-21'.to_date)
     end
 
-    it 'gives nil value for xirr' do
-      assert_equal 0.0, @cf.xirr
+    it 'finds the rate the old solver missed' do
+      # The previous default solver returned config.replace_for_nil (0.0) here.
+      # rtsafe converges on this flow at the default precision.
+      assert_in_delta(-0.831717, @cf.xirr.to_f, 1e-6)
     end
 
     it 'gives correct value with configuration' do
@@ -350,7 +354,8 @@ describe 'Cashflows' do
       @cf = Cashflow.new
       @cf << Transaction.new(1000, date: '2000-01-01'.to_date)
       @cf << Transaction.new(-1200, date: '2001-01-01'.to_date)
-      assert_equal '0.2'.to_f, @cf.irr_guess
+      # 2000 is a leap year, so the horizon is 366/365 years, not exactly 1.
+      assert_equal 0.199, @cf.irr_guess
     end
     
     it 'Zero Periods of Investment' do
@@ -377,7 +382,8 @@ describe 'Cashflows' do
       @cf << Transaction.new(1000, date: '2000-01-01'.to_date)
       @cf << Transaction.new(-100, date: '2010-01-01'.to_date)
       @cf << Transaction.new(-100, date: '2020-01-01'.to_date)
-      assert_equal '0.072'.to_f, @cf.irr_guess
+      # 200 returned on 1000 over 20 years annualizes to a negative rate.
+      assert_equal(-0.077, @cf.irr_guess)
     end
     
     it 'Very Small Periods of Investment' do
@@ -393,7 +399,8 @@ describe 'Cashflows' do
       @cf << Transaction.new(-500, date: '2001-01-01'.to_date)
       @cf << Transaction.new(-300, date: '2002-01-01'.to_date)
       @cf << Transaction.new(-200, date: '2003-01-01'.to_date)
-      assert_equal '0.195'.to_f, @cf.irr_guess
+      # Inflows and outflows net to zero, so the cash-on-cash guess is 0.
+      assert_equal 0.0, @cf.irr_guess
     end
     
     it 'Only Negative Cash Flows' do
@@ -408,7 +415,38 @@ describe 'Cashflows' do
       @cf << Transaction.new(500, date: '2000-01-01'.to_date)
       @cf << Transaction.new(-100, date: '2005-01-01'.to_date)
       @cf << Transaction.new(-400, date: '2010-01-01'.to_date)
-      assert_equal '0.033'.to_f, @cf.irr_guess
+      # Inflows and outflows net to zero, so the cash-on-cash guess is 0.
+      assert_equal 0.0, @cf.irr_guess
     end
-  end 
+  end
+
+  describe 'option and state handling' do
+    it 'lets a per-call raise_exception: false override a cashflow-level true' do
+      cf = Cashflow.new(flow: [
+        Transaction.new(-600, date: '1990-01-01'.to_date),
+        Transaction.new(-600, date: '1995-01-01'.to_date)
+      ], raise_exception: true)
+      assert_raises(ArgumentError) { cf.xirr }
+      assert_equal Xirr::REPLACE_FOR_NIL, cf.xirr(raise_exception: false)
+    end
+
+    it 'does not let a per-call period leak into later xnpv/mirr' do
+      cf = Cashflow.new(flow: [
+        Transaction.new(-1000, date: '2000-01-01'.to_date),
+        Transaction.new(1200, date: '2001-01-01'.to_date)
+      ])
+      before = cf.xnpv(0.1)
+      cf.xirr(period: 100)
+      assert_equal before, cf.xnpv(0.1)
+    end
+
+    it 'refreshes memoized dates when a transaction is pushed' do
+      cf = Cashflow.new
+      cf << Transaction.new(1000, date: '2000-01-01'.to_date)
+      cf << Transaction.new(-500, date: '2005-01-01'.to_date)
+      cf.min_date # memoize
+      cf << Transaction.new(-500, date: '1990-01-01'.to_date)
+      assert_equal Date.new(1990, 1, 1), cf.min_date
+    end
+  end
 end

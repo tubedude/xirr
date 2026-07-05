@@ -1,61 +1,35 @@
 # frozen_string_literal: true
-require 'bigdecimal/newton'
 
 module Xirr
-  # Class to calculate IRR using Newton Method
+  # Plain Newton-Raphson: step from the guess by -xnpv/xnpv' until the step is
+  # smaller than the tolerance. Fast when it converges, but with no bracketing it
+  # can walk off to a non-root or below -100%; {RtSafe} is the safeguarded default
+  # that avoids that. Kept for `xirr(method: :newton_method)`.
   class NewtonMethod
     include Base
-    include Newton
 
+    # @param guess [Float, nil] initial rate
+    # @param options [Hash] reads +:iteration_limit+
+    # @return [Float, nil] the rate rounded to +Xirr.config.precision+, or nil
+    def xirr(guess, options)
+      limit = (options && options[:iteration_limit]) || Xirr.config.iteration_limit
+      rate = (guess || cf.irr_guess).to_f
 
-    # Base class for working with Newton's Method.
-    # @api private
-    class Function
-      values = {
-          eps: Xirr.config.eps,
-          one:  '1.0',
-          two:  '2.0',
-          ten:  '10.0',
-          zero: '0.0'
-      }
+      limit.times do
+        derivative = xnpv_derivative(rate)
+        return nil if derivative.zero?
 
-      # define default values
-      values.each do |key, value|
-        define_method key do
-          BigDecimal(value, Xirr.config.precision)
-        end
+        step = xnpv(rate).to_f / derivative
+        rate -= step
+        # Below -100% the discount base (1 + rate) turns negative and the next
+        # xnpv raises it to a fractional power, producing a Complex. Bail first.
+        return nil if rate.nan? || rate.infinite? || rate <= -1
+        break if step.abs < Xirr.config.eps
       end
 
-      # @param transactions [Cashflow]
-      # @param function [Symbol]
-      # Initializes the Function with the Cashflow it will use as data source and the function to reduce it.
-      def initialize(transactions, function)
-        @transactions = transactions
-        @function = function
-      end
-
-      # Necessary for #nlsolve
-      # @param x [BigDecimal]
-      def values(x)
-        value = @transactions.send(@function, BigDecimal(x[0].to_s, Xirr.config.precision))
-        [BigDecimal(value.to_s, Xirr.config.precision)]
-      end
-    end
-
-    # Calculates XIRR using Newton method
-    # @return [BigDecimal]
-    # @param guess [Float]
-    def xirr(guess, _options)
-      func = Function.new(self, :xnpv)
-      rate = [guess || cf.irr_guess]
-      begin
-        nlsolve(func, rate)
-        (rate[0] <= -1 || rate[0].nan?) ? nil : rate[0].round(Xirr.config.precision)
-
-          # rate[0].round(Xirr.config.precision)
-      rescue
-        nil
-      end
+      rate.nan? ? nil : rate.round(Xirr.config.precision)
+    rescue FloatDomainError, Math::DomainError, RangeError
+      nil
     end
   end
 end
