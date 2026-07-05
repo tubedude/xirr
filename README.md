@@ -1,5 +1,6 @@
 # Xirr
 
+[![Gem Version](https://badge.fury.io/rb/xirr.svg)](https://badge.fury.io/rb/xirr)
 [![CI](https://github.com/tubedude/xirr/actions/workflows/ci.yml/badge.svg)](https://github.com/tubedude/xirr/actions/workflows/ci.yml)
 
 Calculates the XIRR of a cashflow — the internal rate of return for
