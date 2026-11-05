@@ -10,7 +10,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `rake compile` — build the optional native extension into `lib/xirr/` (needs a C compiler).
 - `ruby -Ilib benchmark/solvers.rb` — benchmark the solvers.
 
-Requires Ruby `>= 3.1` and `activesupport >= 6.1, < 8`. There is no system Ruby on
+Requires Ruby `>= 3.1` and `activesupport >= 6.1, < 9`. To test one
+ActiveSupport line, `ACTIVESUPPORT=8.1 bundle update activesupport` (the Gemfile
+pins it; CI runs a Ruby × ActiveSupport matrix this way). There is no system Ruby on
 the dev box used here; see the project memory for the asdf build recipe and the
 `PATH` / `LD_LIBRARY_PATH` needed to run the suite.
 
@@ -77,6 +79,8 @@ the source of the expected values in `test/`.
 
 ### Configuration
 
-`config.rb` uses `ActiveSupport::Configurable`. Each default is both
+`config.rb` defines `Xirr.config` (an `ActiveSupport::OrderedOptions`) and
+`Xirr.configure`. It no longer uses `ActiveSupport::Configurable`, which Rails 8.1
+deprecates and 8.2 removes, so don't reintroduce it. Each default is both
 `Xirr.config.<key>` and a frozen constant `Xirr::<KEY>` (the constant keeps the
 original default after reconfiguration). Configure with `Xirr.configure { |c| ... }`.

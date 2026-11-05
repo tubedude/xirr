@@ -181,7 +181,7 @@ http://rubydoc.info/github/tubedude/xirr/master/frames
 ## Supported versions
 
     Ruby: >= 3.1
-    ActiveSupport: >= 6.1, < 8
+    ActiveSupport: >= 6.1, < 9 (Rails 6.1 through 8.1)
 
 ## Thanks
 
