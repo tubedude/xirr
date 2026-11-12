@@ -1,4 +1,4 @@
-## Unreleased
+## Version 1.0.1
 * Support Rails 8.0 and 8.1: allow `activesupport` `< 9` (was `< 8`).
 * `Xirr.config` no longer uses `ActiveSupport::Configurable`, which Rails 8.1
   deprecates (it printed a deprecation warning on load) and Rails 8.2 removes.
