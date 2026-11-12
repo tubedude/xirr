@@ -1,3 +1,11 @@
+## Unreleased
+* Support Rails 8.0 and 8.1: allow `activesupport` `< 9` (was `< 8`).
+* `Xirr.config` no longer uses `ActiveSupport::Configurable`, which Rails 8.1
+  deprecates (it printed a deprecation warning on load) and Rails 8.2 removes.
+  `Xirr.config` is still an `ActiveSupport::OrderedOptions` and
+  `Xirr.configure { |c| ... }` works as before.
+* CI now tests every supported ActiveSupport line (6.1, 7.2, 8.0, 8.1).
+
 ## Version 1.0.0
 * New default solver: a safeguarded Newton (`rtsafe`) that brackets the root and
   falls back to a bisection step per iteration. It converges on flows the old

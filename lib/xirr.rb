@@ -1,5 +1,4 @@
 require 'xirr/version'
-require 'active_support/configurable'
 require 'xirr/config'
 require 'xirr/base'
 require 'xirr/rtsafe'

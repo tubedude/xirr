@@ -3,6 +3,9 @@ $LOAD_PATH.unshift(File.expand_path('../lib', __dir__))
 require 'minitest/autorun'
 require 'minitest/spec'
 
+# ActiveSupport 6.1/7.0 use Logger without requiring it, which concurrent-ruby
+# >= 1.3.5 no longer does for them.
+require 'logger'
 require 'active_support/all'
 
 require 'xirr/config.rb'

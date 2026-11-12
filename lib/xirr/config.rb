@@ -1,7 +1,23 @@
 # frozen_string_literal: true
 
+require 'active_support/ordered_options'
+
 module Xirr
-  include ActiveSupport::Configurable
+  # The global settings, read and written as +Xirr.config.<key>+.
+  #
+  # This used to come from +ActiveSupport::Configurable+, which Rails 8.1
+  # deprecates and Rails 8.2 removes. It was only ever a module-level
+  # +ActiveSupport::OrderedOptions+, so that is what this returns.
+  # @return [ActiveSupport::OrderedOptions]
+  def self.config
+    @config ||= ActiveSupport::OrderedOptions.new
+  end
+
+  # Yields {config} for block-style setup:
+  #   Xirr.configure { |c| c.eps = 1.0e-8 }
+  def self.configure
+    yield config
+  end
 
   # Default configuration. Each entry becomes both a config setting
   # (+Xirr.config.eps+) and a frozen constant of the same name upcased
